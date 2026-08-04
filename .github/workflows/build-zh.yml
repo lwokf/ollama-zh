@@ -49,10 +49,15 @@ jobs:
           echo "VERSION=${V}" >> "$GITHUB_OUTPUT"
           echo "target version: ${V}"
 
-      - name: 检查是否已构建过该版本(定时触发时跳过)
+      # 定时触发时若已构建过该版本则跳过;手动触发始终重新构建(会覆盖旧 Release)
+      - name: 检查是否已构建过该版本(仅定时触发时跳过)
         id: check-existing
         shell: bash
         run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "SKIP=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           TAG="zh-${{ steps.version.outputs.VERSION }}"
           if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
             echo "release ${TAG} already exists, skipping"
@@ -130,6 +135,8 @@ jobs:
           New-Item -ItemType Directory -Path $dir | Out-Null
           Copy-Item ollama-app-zh.exe "$dir\ollama app.exe"
           Copy-Item scripts\apply-patch.ps1 $dir\
+          Copy-Item scripts\apply-patch.cmd $dir\
+          Copy-Item scripts\restore-official.cmd $dir\
           Copy-Item README.md "$dir\README-使用说明.md" -ErrorAction SilentlyContinue
           Compress-Archive -Path $dir -DestinationPath "$dir-win64.zip" -Force
           Get-ChildItem "ollama-zh-*.zip" | Select-Object Name, Length
@@ -151,13 +158,25 @@ jobs:
           body: |
             ## Ollama 汉化补丁 ${{ steps.version.outputs.VERSION }}
 
-            ### 使用方法
+            ### 最简单的用法(推荐,双击即可)
             1. 退出正在运行的 Ollama(托盘图标右键 → 退出 Ollama)
-            2. 解压本 zip,右键"以管理员身份运行 PowerShell",在解压目录执行:
-               ```powershell
-               .\apply-patch.ps1
-               ```
-            3. 重新启动 Ollama,界面即为中文
+            2. 解压本 zip,**双击 `apply-patch.cmd`**
+            3. 弹窗(UAC)点"是",等待提示完成
+            4. 重新启动 Ollama,界面即为中文
+
+            ### 高级用法(可选)
+            解压目录内右键"以管理员身份运行 PowerShell",执行:
+            ```powershell
+            .\apply-patch.ps1
+            ```
+            还原官方原版:双击 `restore-official.cmd`(或运行 `apply-patch.ps1 -Restore`)
+
+            ### 解压位置:任意目录都可以
+            补丁包可以解压到任意目录(桌面/下载/任意文件夹),**不需要**放进 Ollama 安装目录。
+            脚本会自动查找安装位置(依次检测 `D:\ollama`、`%LOCALAPPDATA%\Programs\Ollama`、`C:\Program Files\Ollama`),
+            也可手动指定:`.\apply-patch.ps1 -InstallDir "D:\你的路径"`。
+
+            唯一要求:**`apply-patch.cmd`/`apply-patch.ps1` 与 `ollama app.exe` 必须保持在同一个文件夹内**。
 
             ### 解压位置:任意目录都可以
             补丁包可以解压到任意目录(桌面/下载/任意文件夹),**不需要**放进 Ollama 安装目录。
@@ -179,5 +198,6 @@ jobs:
             - 首次应用自动备份官方 exe(`ollama app.exe.official.bak`)
             - 汉化来源:本仓库 `translations/zh-CN.patch`(可复现、可审查)
           files: ollama-zh-*.zip
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

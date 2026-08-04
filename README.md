@@ -11,13 +11,13 @@ Ollama 桌面端官方只有英文界面,且没有 i18n 支持(UI 通过 `go:emb
 
 1. 到本仓库 **Releases** 下载最新 `ollama-zh-vX.Y.Z-win64.zip`
 2. 退出正在运行的 Ollama(托盘图标右键 → 退出 Ollama)
-3. 解压 zip,右键"以管理员身份运行 PowerShell",在解压目录执行:
+3. 解压 zip
+4. **双击 `apply-patch.cmd`**(会自动请求管理员权限,UAC 弹窗点"是"即可)
+5. 重新启动 Ollama → 界面为中文
 
-   ```powershell
-   .\apply-patch.ps1
-   ```
-
-4. 重新启动 Ollama → 界面为中文
+> 不需要右键"以管理员身份运行 PowerShell"——双击就能完成。
+> 还原官方原版:双击 `restore-official.cmd`。
+> 若不想用双击脚本,也可以用 PowerShell 手动执行 `apply-patch.ps1`(方法见下)。
 
 ### 解压位置:任意目录都可以
 
@@ -28,7 +28,7 @@ Ollama 桌面端官方只有英文界面,且没有 i18n 支持(UI 通过 `go:emb
 .\apply-patch.ps1 -InstallDir "D:\你的安装路径"
 ```
 
-唯一要求:**`apply-patch.ps1` 和 `ollama app.exe` 必须保持在同一文件夹内**(脚本从自身所在目录查找汉化版 exe)。
+唯一要求:**双击脚本(或 `apply-patch.ps1`)和 `ollama app.exe` 必须保持在同一文件夹内**(脚本从自身所在目录查找汉化版 exe)。
 
 ### 官方更新之后
 

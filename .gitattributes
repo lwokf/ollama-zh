@@ -1,0 +1,9 @@
+# 强制 LF 行尾:补丁文件与脚本在 Windows 检出时不能被转成 CRLF,
+# 否则 git apply 无法匹配上游源码(Go 文件被上游 .gitattributes 固定为 LF)
+*.patch text eol=lf
+*.mjs   text eol=lf
+*.py    text eol=lf
+*.yml   text eol=lf
+*.ps1   text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf

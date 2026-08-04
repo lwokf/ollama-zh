@@ -74,8 +74,11 @@ jobs:
         if: steps.check-existing.outputs.SKIP != 'true'
         shell: bash
         run: |
-          git -C upstream apply --check ../translations/zh-CN.patch
-          git -C upstream apply ../translations/zh-CN.patch
+          # 剔除可能的 CR 行尾(防止 Windows 检出把补丁转成 CRLF 导致无法匹配 LF 源码)
+          tr -d '\r' < ../translations/zh-CN.patch > ../translations/zh-CN.lf.patch
+          git -C upstream apply --check ../translations/zh-CN.lf.patch
+          git -C upstream apply ../translations/zh-CN.lf.patch
+          rm -f ../translations/zh-CN.lf.patch
           echo "patch applied"
 
       - name: 安装 Node.js

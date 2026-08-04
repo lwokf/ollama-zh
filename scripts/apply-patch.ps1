@@ -2,18 +2,24 @@
 #
 # 用法:
 #   1. 退出正在运行的 Ollama(托盘图标右键 -> 退出 Ollama)
-#   2. 右键"以管理员身份运行 PowerShell",cd 到本脚本所在目录,执行:
+#   2. 右键"以管理员身份运行 PowerShell",在解压目录执行:
 #        .\apply-patch.ps1
 #      或指定安装目录:
 #        .\apply-patch.ps1 -InstallDir "D:\ollama"
 #   3. 还原官方原版:
 #        .\apply-patch.ps1 -Restore
 #
+# 解压位置(重要):
+#   - 本脚本与汉化版 exe 可以放在【任意目录】(桌面/下载/D 盘等),无需放进 Ollama 安装目录
+#   - 脚本会自动查找 Ollama 安装位置(依次检测 D:\ollama、%LOCALAPPDATA%\Programs\Ollama、C:\Program Files\Ollama)
+#   - 唯一要求:apply-patch.ps1 与汉化版 "ollama app.exe" 必须保持在同一个文件夹内
+#   - 若提示无法加载脚本,先执行:Set-ExecutionPolicy -Scope Process Bypass
+#
 # 说明:
 #   - 只替换 ollama app.exe(桌面端 UI 壳),服务端 ollama.exe 保持官方原版
 #   - 首次应用时自动备份官方 exe 为 "ollama app.exe.official.bak"
 #   - 官方更新(自动更新/重新安装)会覆盖汉化版,更新后重新运行本脚本即可恢复中文
-#   - 本目录下的 "ollama app.exe" 必须是本版本对应的汉化版
+#   - 汉化版 exe 必须与官方安装的版本号对应
 
 param(
     [string]$InstallDir = "",

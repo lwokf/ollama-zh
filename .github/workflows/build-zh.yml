@@ -153,11 +153,18 @@ jobs:
 
             ### 使用方法
             1. 退出正在运行的 Ollama(托盘图标右键 → 退出 Ollama)
-            2. 解压本 zip,右键"以管理员身份运行 PowerShell",执行:
+            2. 解压本 zip,右键"以管理员身份运行 PowerShell",在解压目录执行:
                ```powershell
                .\apply-patch.ps1
                ```
             3. 重新启动 Ollama,界面即为中文
+
+            ### 解压位置:任意目录都可以
+            补丁包可以解压到任意目录(桌面/下载/任意文件夹),**不需要**放进 Ollama 安装目录。
+            脚本会自动查找安装位置(依次检测 `D:\ollama`、`%LOCALAPPDATA%\Programs\Ollama`、`C:\Program Files\Ollama`),
+            也可手动指定:`.\apply-patch.ps1 -InstallDir "D:\你的路径"`。
+
+            唯一要求:**`apply-patch.ps1` 与 `ollama app.exe` 必须保持在同一个文件夹内**。
 
             ### 升级后如何恢复中文
             官方更新(自动更新或重装)会覆盖汉化版 exe,更新完成后**重新运行一次 apply-patch.ps1 即可**。

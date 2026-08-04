@@ -19,6 +19,17 @@ Ollama 桌面端官方只有英文界面,且没有 i18n 支持(UI 通过 `go:emb
 
 4. 重新启动 Ollama → 界面为中文
 
+### 解压位置:任意目录都可以
+
+补丁包可以解压到**任意目录**(桌面、下载、D 盘任意文件夹都行),**不需要**放进 Ollama 安装目录。
+脚本会自动查找 Ollama 安装位置(依次检测 `D:\ollama`、`%LOCALAPPDATA%\Programs\Ollama`、`C:\Program Files\Ollama`,也可以手动指定):
+
+```powershell
+.\apply-patch.ps1 -InstallDir "D:\你的安装路径"
+```
+
+唯一要求:**`apply-patch.ps1` 和 `ollama app.exe` 必须保持在同一文件夹内**(脚本从自身所在目录查找汉化版 exe)。
+
 ### 官方更新之后
 
 官方更新会把 exe 覆盖回英文。**重新运行一次 `apply-patch.ps1` 即可恢复中文**(自动备份官方 exe)。

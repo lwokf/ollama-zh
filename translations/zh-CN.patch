@@ -1,0 +1,1053 @@
+diff --git a/app/cmd/app/app.go b/app/cmd/app/app.go
+index 9c8b736..5127c06 100644
+--- a/app/cmd/app/app.go
++++ b/app/cmd/app/app.go
+@@ -223,9 +223,9 @@ func main() {
+ 		}
+ 
+ 		if err != nil {
+-			slog.Error("Vite dev server not running on port 5173")
+-			fmt.Fprintln(os.Stderr, "Error: Vite dev server is not running on port 5173")
+-			fmt.Fprintln(os.Stderr, "Please run 'npm run dev' in the ui/app directory to start the UI in development mode")
++			slog.Error("Vite 开发服务器未运行在 5173 端口")
++			fmt.Fprintln(os.Stderr, "错误:Vite 开发服务器未运行在 5173 端口")
++			fmt.Fprintln(os.Stderr, "请在 ui/app 目录运行 'npm run dev' 以开发模式启动 UI")
+ 			os.Exit(1)
+ 		}
+ 	}
+diff --git a/app/cmd/app/app_darwin.m b/app/cmd/app/app_darwin.m
+index 65f91b3..079ba1a 100644
+--- a/app/cmd/app/app_darwin.m
++++ b/app/cmd/app/app_darwin.m
+@@ -65,19 +65,19 @@ bool firstTimeRun,startHidden; // Set in run before initialization
+     // Create status item and menu
+     NSMenu *menu = [[NSMenu alloc] init];
+     NSMenuItem *openMenuItem =
+-        [[NSMenuItem alloc] initWithTitle:@"Open Ollama"
++        [[NSMenuItem alloc] initWithTitle:@"打开 Ollama"
+                                    action:@selector(openUI)
+                             keyEquivalent:@""];
+     [openMenuItem setTarget:self];
+     [menu addItem:openMenuItem];
+ 
+-    [menu addItemWithTitle:@"Settings..."
++    [menu addItemWithTitle:@"设置..."
+                     action:@selector(settingsUI)
+              keyEquivalent:@","];
+     [menu addItem:[NSMenuItem separatorItem]];
+ 
+     NSMenuItem *updateAvailable =
+-        [[NSMenuItem alloc] initWithTitle:@"An update is available"
++        [[NSMenuItem alloc] initWithTitle:@"有可用更新"
+                                    action:nil
+                             keyEquivalent:@""];
+     [updateAvailable setEnabled:NO];
+@@ -85,7 +85,7 @@ bool firstTimeRun,startHidden; // Set in run before initialization
+     [menu addItem:updateAvailable];
+ 
+     NSMenuItem *restartMenuItem =
+-        [[NSMenuItem alloc] initWithTitle:@"Restart to update"
++        [[NSMenuItem alloc] initWithTitle:@"重启以更新"
+                                    action:@selector(startUpdate)
+                             keyEquivalent:@""];
+     [restartMenuItem setTarget:self];
+@@ -94,7 +94,7 @@ bool firstTimeRun,startHidden; // Set in run before initialization
+ 
+     [menu addItem:[NSMenuItem separatorItem]];
+ 
+-    [menu addItemWithTitle:@"Quit Ollama"
++    [menu addItemWithTitle:@"退出 Ollama"
+                     action:@selector(quit)
+              keyEquivalent:@"q"];
+ 
+@@ -124,7 +124,7 @@ bool firstTimeRun,startHidden; // Set in run before initialization
+                        action:@selector(aboutOllama)
+                 keyEquivalent:@""];
+     [appMenu addItem:[NSMenuItem separatorItem]];
+-    [appMenu addItemWithTitle:@"Settings..."
++    [appMenu addItemWithTitle:@"设置..."
+                     action:@selector(settingsUI)
+                 keyEquivalent:@","];
+     [appMenu addItem:[NSMenuItem separatorItem]];
+@@ -146,7 +146,7 @@ bool firstTimeRun,startHidden; // Set in run before initialization
+     NSMenuItem *fileMenuItem = [[NSMenuItem alloc] init];
+     NSMenu *fileMenu        = [[NSMenu alloc] initWithTitle:@"File"];
+ 
+-    NSMenuItem *newChatItem = [[NSMenuItem alloc] initWithTitle:@"New Chat"
++    NSMenuItem *newChatItem = [[NSMenuItem alloc] initWithTitle:@"新建对话"
+                                                     action:@selector(newChat)
+                                                 keyEquivalent:@"n"];
+     [newChatItem setTarget:self];
+@@ -171,7 +171,7 @@ bool firstTimeRun,startHidden; // Set in run before initialization
+     [editMenu addItemWithTitle:@"Cut"
+                         action:@selector(cut:)
+                  keyEquivalent:@"x"];
+-    [editMenu addItemWithTitle:@"Copy"
++    [editMenu addItemWithTitle:@"复制"
+                         action:@selector(copy:)
+                  keyEquivalent:@"c"];
+     [editMenu addItemWithTitle:@"Paste"
+diff --git a/app/cmd/app/app_windows.go b/app/cmd/app/app_windows.go
+index 3e2196d..76085b6 100644
+--- a/app/cmd/app/app_windows.go
++++ b/app/cmd/app/app_windows.go
+@@ -265,12 +265,12 @@ func createLoginShortcut() error {
+ 			if err != nil {
+ 				return fmt.Errorf("unable to sync shortcut %s : %w", startupShortcut, err)
+ 			}
+-			slog.Info("Created Startup shortcut", "shortcut", startupShortcut)
++			slog.Info("已创建开机启动快捷方式", "shortcut", startupShortcut)
+ 		} else {
+ 			slog.Warn("unexpected error looking up Startup shortcut", "error", err)
+ 		}
+ 	} else {
+-		slog.Debug("Startup link already exists", "shortcut", startupShortcut)
++		slog.Debug("开机启动快捷方式已存在", "shortcut", startupShortcut)
+ 	}
+ 	return nil
+ }
+diff --git a/app/cmd/app/webview.go b/app/cmd/app/webview.go
+index 9332f10..a5c27f3 100644
+--- a/app/cmd/app/webview.go
++++ b/app/cmd/app/webview.go
+@@ -253,13 +253,13 @@ func (w *Webview) Run(path string) unsafe.Pointer {
+ 					})
+ 				}
+ 
+-				directory, err := dialog.Directory().Title("Select Model Directory").ShowHidden(true).Browse()
++				directory, err := dialog.Directory().Title("选择模型目录").ShowHidden(true).Browse()
+ 				if err != nil {
+-					slog.Debug("Directory selection cancelled or failed", "error", err)
++					slog.Debug("未选择目录或选择已取消", "error", err)
+ 					callCallback(nil)
+ 					return
+ 				}
+-				slog.Debug("Directory selected", "path", directory)
++				slog.Debug("已选择目录", "path", directory)
+ 				callCallback(directory)
+ 			}()
+ 		})
+@@ -287,11 +287,11 @@ func (w *Webview) Run(path string) unsafe.Pointer {
+ 
+ 				// Use native multiple file selection with extension filtering
+ 				filenames, err := dialog.File().
+-					Filter("Supported Files", allowedExts...).
+-					Title("Select Files").
++					Filter("支持的文件", allowedExts...).
++					Title("选择文件").
+ 					LoadMultiple()
+ 				if err != nil {
+-					slog.Debug("Multiple file selection cancelled or failed", "error", err)
++					slog.Debug("未选择文件或选择已取消", "error", err)
+ 					callCallback(nil)
+ 					return
+ 				}
+@@ -380,13 +380,13 @@ func (w *Webview) Run(path string) unsafe.Pointer {
+ 					})
+ 				}
+ 
+-				directory, err := dialog.Directory().Title("Select Working Directory").ShowHidden(true).Browse()
++				directory, err := dialog.Directory().Title("选择工作目录").ShowHidden(true).Browse()
+ 				if err != nil {
+-					slog.Debug("Directory selection cancelled or failed", "error", err)
++					slog.Debug("未选择目录或选择已取消", "error", err)
+ 					callCallback(nil)
+ 					return
+ 				}
+-				slog.Debug("Directory selected", "path", directory)
++				slog.Debug("已选择目录", "path", directory)
+ 				callCallback(directory)
+ 			}()
+ 		})
+diff --git a/app/ui/app.go b/app/ui/app.go
+index d73df2c..8b960ec 100644
+--- a/app/ui/app.go
++++ b/app/ui/app.go
+@@ -35,7 +35,7 @@ func (s *Server) appHandler() http.Handler {
+ 			if errors.Is(err, fs.ErrNotExist) {
+ 				http.NotFound(w, r)
+ 			} else {
+-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
++				http.Error(w, "服务器内部错误", http.StatusInternalServerError)
+ 			}
+ 			return
+ 		}
+diff --git a/app/ui/app/src/components/Chat.tsx b/app/ui/app/src/components/Chat.tsx
+index e0fcb4f..c957a83 100644
+--- a/app/ui/app/src/components/Chat.tsx
++++ b/app/ui/app/src/components/Chat.tsx
+@@ -293,6 +293,6 @@ export default function Chat({ chatId }: { chatId: string }) {
+       )}
+     </FileUpload>
+   ) : (
+-    <div>Loading...</div>
++    <div>加载中...</div>
+   );
+ }
+diff --git a/app/ui/app/src/components/ChatForm.tsx b/app/ui/app/src/components/ChatForm.tsx
+index b0ae1af..02d6d67 100644
+--- a/app/ui/app/src/components/ChatForm.tsx
++++ b/app/ui/app/src/components/ChatForm.tsx
+@@ -681,10 +681,10 @@ function ChatForm({
+       const errorEvent = new ErrorEvent({
+         eventName: "error" as const,
+         error:
+-          error instanceof Error ? error.message : "Failed to select files",
++          error instanceof Error ? error.message : "选择文件失败",
+         code: "file_selection_error",
+         details:
+-          "An error occurred while trying to open the file selection dialog. Please try again.",
++          "打开文件选择对话框时出错,请重试。",
+       });
+ 
+       setFileUploadError(errorEvent);
+@@ -701,15 +701,15 @@ function ChatForm({
+               eventName: "error",
+               error:
+                 activeFeatureForBanner === "webSearch"
+-                  ? "Web search requires authentication"
+-                  : "Cloud models require authentication",
++                  ? "联网搜索需要登录"
++                  : "云端模型需要登录",
+               code: "cloud_unauthorized",
+             })
+           }
+           message={
+             activeFeatureForBanner === "webSearch"
+-              ? "Web search requires an Ollama account"
+-              : "Cloud models require an Ollama account"
++              ? "联网搜索需要 Ollama 账号"
++              : "云端模型需要 Ollama 账号"
+           }
+           className="mb-4"
+           onDismiss={() => {
+@@ -731,9 +731,7 @@ function ChatForm({
+         )}
+         {editingMessage && (
+           <div className="w-full px-5 pb-2">
+-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+-              Press ESC to cancel editing
+-            </p>
++            <p className="text-xs text-neutral-500 dark:text-neutral-400">按 ESC 取消编辑</p>
+           </div>
+         )}
+         {(message.attachments.length > 0 || message.fileErrors.length > 0) && (
+@@ -778,9 +776,7 @@ function ChatForm({
+                     {attachment.filename}
+                   </span>
+                   {isUnsupportedImage && (
+-                    <span className="text-xs text-red-600 dark:text-red-400 opacity-75">
+-                      This model does not support images
+-                    </span>
++                    <span className="text-xs text-red-600 dark:text-red-400 opacity-75">此模型不支持图片</span>
+                   )}
+                 </div>
+                 <button
+@@ -860,7 +856,7 @@ function ChatForm({
+             ref={textareaRef}
+             value={message.content}
+             onChange={handleTextareaChange}
+-            placeholder="Send a message"
++            placeholder="发送消息"
+             disabled={isDisabled}
+             className={`allow-context-menu w-full overflow-y-auto text-neutral-700 outline-none resize-none border-none bg-transparent dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 min-h-[24px] leading-6 transition-opacity duration-300 ${
+               editingMessage ? "animate-fade-in" : ""
+@@ -883,7 +879,7 @@ function ChatForm({
+                   type="button"
+                   onClick={handleFilesUpload}
+                   className="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer border border-transparent"
+-                  title="Upload multiple files"
++                  title="上传多个文件"
+                 >
+                   <PlusIcon className="w-4.5 h-4.5 stroke-2 text-neutral-500 dark:text-neutral-400" />
+                 </button>
+diff --git a/app/ui/app/src/components/ChatSidebar.tsx b/app/ui/app/src/components/ChatSidebar.tsx
+index 2d1b07a..17a9707 100644
+--- a/app/ui/app/src/components/ChatSidebar.tsx
++++ b/app/ui/app/src/components/ChatSidebar.tsx
+@@ -158,16 +158,16 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
+ 
+   const chatGroups = useMemo(() => {
+     return [
+-      { name: "Today", chats: groupedChats.today },
+-      { name: "This week", chats: groupedChats.thisWeek },
+-      { name: "Older", chats: groupedChats.older },
++      { name: "今天", chats: groupedChats.today },
++      { name: "本周", chats: groupedChats.thisWeek },
++      { name: "更早", chats: groupedChats.older },
+     ].filter((group) => group.chats.length > 0);
+   }, [groupedChats]);
+ 
+   const handleDeleteChat = useCallback(
+     async (chatId: string) => {
+       const confirmed = window.confirm(
+-        `Are you sure you want to remove this chat?`,
++        `确定要删除这个对话吗?`,
+       );
+ 
+       if (!confirmed) return;
+@@ -227,13 +227,13 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
+   const handleContextMenu = useCallback(
+     async (_: React.MouseEvent, chatId: string, chatTitle: string) => {
+       const selectedAction = await window.menu([
+-        { label: "Rename", enabled: true },
+-        { label: "Delete", enabled: true },
++        { label: "重命名", enabled: true },
++        { label: "删除", enabled: true },
+       ]);
+ 
+-      if (selectedAction === "Rename") {
++      if (selectedAction === "重命名") {
+         startEditing(chatId, chatTitle);
+-      } else if (selectedAction === "Delete") {
++      } else if (selectedAction === "删除") {
+         handleDeleteChat(chatId);
+       }
+     },
+@@ -244,7 +244,7 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
+     return (
+       <nav className="flex min-h-0 flex-col">
+         <div className="flex flex-1 flex-col p-4">
+-          <div className="p-4">Loading...</div>
++          <div className="p-4">加载中...</div>
+         </div>
+       </nav>
+     );
+@@ -254,7 +254,7 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
+     return (
+       <nav className="flex min-h-0 flex-col">
+         <div className="flex flex-1 flex-col p-4">
+-          <div className="p-4 text-red-500">Error loading chats</div>
++          <div className="p-4 text-red-500">加载对话列表失败</div>
+         </div>
+       </nav>
+     );
+@@ -281,7 +281,7 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
+             <path d="M17.0859 3.39949L15.2135 5.27196H7.27028C5.78649 5.27196 4.94684 6.11336 4.94684 7.59716V16.664C4.94684 18.1558 5.78649 18.9892 7.27028 18.9892H16.3406C17.8324 18.9892 18.6623 18.1558 18.6623 16.664V8.79514L20.5428 6.9115C20.567 7.11532 20.5773 7.33066 20.5773 7.55419V16.7149C20.5773 19.4069 19.0818 20.9024 16.3898 20.9024H7.22107C4.53708 20.9024 3.03357 19.4069 3.03357 16.7149V7.55419C3.03357 4.8622 4.53708 3.35869 7.22107 3.35869H16.3898C16.6329 3.35869 16.8662 3.37094 17.0859 3.39949Z" />
+             <path d="M9.92714 14.381L11.914 13.5403L20.8312 4.63114L19.3404 3.1581L10.433 12.0655L9.55234 13.9964C9.45664 14.2169 9.70293 14.4714 9.92714 14.381ZM21.5767 3.89364L22.2588 3.19384C22.6347 2.80184 22.6435 2.2663 22.2711 1.90536L22.0148 1.64287C21.6822 1.31377 21.1334 1.36513 20.7689 1.72158L20.0859 2.39833L21.5767 3.89364Z" />
+           </svg>
+-          <span className="truncate">New Chat</span>
++          <span className="truncate">新建对话</span>
+         </Link>
+         <Link
+           to="/c/$chatId"
+@@ -298,7 +298,7 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
+           draggable={false}
+         >
+           <RocketLaunchIcon className="h-5 w-5 stroke-current" />
+-          <span className="truncate">Launch</span>
++          <span className="truncate">启动</span>
+         </Link>
+         {isWindows && (
+           <Link
+@@ -307,7 +307,7 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
+             draggable={false}
+           >
+             <CogIcon className="h-5 w-5 stroke-current" />
+-            <span className="truncate">Settings</span>
++            <span className="truncate">设置</span>
+           </Link>
+         )}
+       </header>
+diff --git a/app/ui/app/src/components/CopyButton.tsx b/app/ui/app/src/components/CopyButton.tsx
+index e43a500..eb28b6e 100644
+--- a/app/ui/app/src/components/CopyButton.tsx
++++ b/app/ui/app/src/components/CopyButton.tsx
+@@ -87,7 +87,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({
+       {showLabels ? (
+         <span className="flex items-center gap-1">
+           {icon}
+-          {isCopied ? "Copied" : "Copy"}
++          {isCopied ? "已复制" : "复制"}
+         </span>
+       ) : (
+         icon
+diff --git a/app/ui/app/src/components/DisplayLogin.tsx b/app/ui/app/src/components/DisplayLogin.tsx
+index 3c10c69..442c66e 100644
+--- a/app/ui/app/src/components/DisplayLogin.tsx
++++ b/app/ui/app/src/components/DisplayLogin.tsx
+@@ -59,13 +59,13 @@ export const DisplayLogin = ({
+   };
+ 
+   const action: DisplayAction = {
+-    label: "Sign In",
++    label: "登录",
+     onClick: handleSignIn,
+   };
+ 
+   return (
+     <Display
+-      message={message || "Cloud models require an Ollama account"}
++      message={message || "云端模型需要 Ollama 账号"}
+       action={action}
+       className={className}
+       onDismiss={onDismiss}
+diff --git a/app/ui/app/src/components/DisplayUpgrade.tsx b/app/ui/app/src/components/DisplayUpgrade.tsx
+index 4f500f3..026a368 100644
+--- a/app/ui/app/src/components/DisplayUpgrade.tsx
++++ b/app/ui/app/src/components/DisplayUpgrade.tsx
+@@ -15,7 +15,7 @@ export const DisplayUpgrade = ({
+   onDismiss,
+   className,
+   message,
+-  label = "Upgrade",
++  label = "升级",
+   href = "https://ollama.com/upgrade",
+ }: DisplayUpgradeProps) => {
+   if (!error || error.code !== "usage_limit_upgrade") return null;
+@@ -34,7 +34,7 @@ export const DisplayUpgrade = ({
+ 
+   return (
+     <Display
+-      message={message || error.error || "An error occurred"}
++      message={message || error.error || "发生错误"}
+       variant={variant}
+       onDismiss={onDismiss}
+       action={action}
+diff --git a/app/ui/app/src/components/Downloading.tsx b/app/ui/app/src/components/Downloading.tsx
+index 93975da..5352c61 100644
+--- a/app/ui/app/src/components/Downloading.tsx
++++ b/app/ui/app/src/components/Downloading.tsx
+@@ -37,7 +37,7 @@ export default function Downloading({
+             <path d="M8.67188 1.83594C8.25195 1.83594 7.89062 2.17773 7.89062 2.58789V12.5195L8.00781 15.1562C8.02734 15.5176 8.31055 15.8105 8.67188 15.8105C9.02344 15.8105 9.30664 15.5176 9.32617 15.1562L9.44336 12.5195V2.58789C9.44336 2.17773 9.0918 1.83594 8.67188 1.83594ZM5.35156 11.5625C4.94141 11.5625 4.64844 11.8457 4.64844 12.2461C4.64844 12.4609 4.73633 12.6172 4.88281 12.7637L8.10547 15.8691C8.30078 16.0645 8.4668 16.123 8.67188 16.123C8.86719 16.123 9.0332 16.0645 9.22852 15.8691L12.4512 12.7637C12.5977 12.6172 12.6855 12.4609 12.6855 12.2461C12.6855 11.8457 12.373 11.5625 11.9727 11.5625C11.7773 11.5625 11.582 11.6406 11.4453 11.7969L9.93164 13.4082L8.67188 14.7461L7.40234 13.4082L5.88867 11.7969C5.75195 11.6406 5.54688 11.5625 5.35156 11.5625Z" />
+           </svg>
+ 
+-          <div className="ml-6">Downloading model</div>
++          <div className="ml-6">正在下载模型</div>
+         </div>
+         <div className="text-sm text-neutral-500 dark:text-neutral-500 ml-6">
+           {`${formatBytes(completed, unit)} / ${formatBytes(total, unit)} (${Math.floor(percentage)}%)`}
+diff --git a/app/ui/app/src/components/ErrorMessage.tsx b/app/ui/app/src/components/ErrorMessage.tsx
+index 4ebbeec..e234621 100644
+--- a/app/ui/app/src/components/ErrorMessage.tsx
++++ b/app/ui/app/src/components/ErrorMessage.tsx
+@@ -60,7 +60,7 @@ export const ErrorMessage = ({ error }: ErrorMessageProps) => {
+             />
+           </svg>
+         </div>
+-        <h3>Error</h3>
++        <h3>错误</h3>
+       </div>
+ 
+       <div className="flex items-start ml-[1.8rem] mt-2">
+diff --git a/app/ui/app/src/components/LaunchCommands.tsx b/app/ui/app/src/components/LaunchCommands.tsx
+index dcf2ab9..b19bedc 100644
+--- a/app/ui/app/src/components/LaunchCommands.tsx
++++ b/app/ui/app/src/components/LaunchCommands.tsx
+@@ -17,7 +17,7 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
+     id: "claude",
+     name: "Claude Code",
+     command: "ollama launch claude",
+-    description: "Anthropic's coding tool with subagents",
++    description: "Anthropic 的编码工具(支持子代理)",
+     icon: "/launch-icons/claude-code.svg",
+     iconClassName: "h-7 w-7",
+   },
+@@ -25,7 +25,7 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
+     id: "chatgpt",
+     name: "ChatGPT",
+     command: "ollama launch chatgpt",
+-    description: "Complete work with ChatGPT",
++    description: "使用 ChatGPT 完成任务",
+     icon: "/launch-icons/codex-app.png",
+     iconClassName: "h-full w-full",
+   },
+@@ -33,7 +33,7 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
+     id: "hermes",
+     name: "Hermes Agent",
+     command: "ollama launch hermes",
+-    description: "Self-improving AI agent built by Nous Research",
++    description: "由 Nous Research 打造的自进化 AI 代理",
+     icon: "/launch-icons/hermes-agent.svg",
+     iconClassName: "h-7 w-7",
+   },
+@@ -41,14 +41,14 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
+     id: "openclaw",
+     name: "OpenClaw",
+     command: "ollama launch openclaw",
+-    description: "Personal AI with 100+ skills",
++    description: "拥有 100+ 技能的个人 AI",
+     icon: "/launch-icons/openclaw.svg",
+   },
+   {
+     id: "opencode",
+     name: "OpenCode",
+     command: "ollama launch opencode",
+-    description: "Anomaly's open-source coding agent",
++    description: "Anomaly 的开源编码代理",
+     icon: "/launch-icons/opencode.svg",
+     iconClassName: "h-7 w-7 rounded",
+   },
+@@ -56,7 +56,7 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
+     id: "codex",
+     name: "Codex",
+     command: "ollama launch codex",
+-    description: "OpenAI's open-source coding agent",
++    description: "OpenAI 的开源编码代理",
+     icon: "/launch-icons/codex.svg",
+     darkIcon: "/launch-icons/codex-dark.svg",
+     iconClassName: "h-7 w-7",
+@@ -65,7 +65,7 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
+     id: "copilot",
+     name: "Copilot CLI",
+     command: "ollama launch copilot",
+-    description: "GitHub's AI coding agent for the terminal",
++    description: "GitHub 的终端 AI 编码代理",
+     icon: "/launch-icons/copilot.svg",
+     darkIcon: "/launch-icons/copilot-dark.svg",
+     iconClassName: "h-7 w-7",
+@@ -74,14 +74,14 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
+     id: "droid",
+     name: "Droid",
+     command: "ollama launch droid",
+-    description: "Factory's coding agent across terminal and IDEs",
++    description: "Factory 跨终端与 IDE 的编码代理",
+     icon: "/launch-icons/droid.svg",
+   },
+   {
+     id: "pi",
+     name: "Pi",
+     command: "ollama launch pi",
+-    description: "Minimal AI agent toolkit with plugin support",
++    description: "支持插件的极简 AI 代理工具包",
+     icon: "/launch-icons/pi.svg",
+     darkIcon: "/launch-icons/pi-dark.svg",
+     iconClassName: "h-7 w-7",
+@@ -123,7 +123,7 @@ export default function LaunchCommands() {
+             <CopyButton
+               content={item.command}
+               size="md"
+-              title="Copy command to clipboard"
++              title="复制命令到剪贴板"
+               className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/70"
+               onCopy={() => {
+                 setSettings({ LastHomeView: item.id }).catch(() => { });
+@@ -141,12 +141,8 @@ export default function LaunchCommands() {
+         className={`flex-1 overflow-y-auto overscroll-contain relative min-h-0 ${isWindows ? "xl:pt-4" : "xl:pt-8"}`}
+       >
+         <div className="max-w-[730px] mx-auto w-full px-4 pt-4 pb-20 sm:px-6 sm:pt-6 sm:pb-24 lg:px-8 lg:pt-8 lg:pb-28">
+-          <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+-            Launch
+-          </h1>
+-          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+-            Copy a command and run it in your terminal.
+-          </p>
++          <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">启动</h1>
++          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">复制命令并在终端中运行。</p>
+ 
+           <div className="mt-6 grid gap-7">
+             {LAUNCH_COMMANDS.map(renderCommandCard)}
+diff --git a/app/ui/app/src/components/Message.tsx b/app/ui/app/src/components/Message.tsx
+index 7e5d3a7..e0b11e8 100644
+--- a/app/ui/app/src/components/Message.tsx
++++ b/app/ui/app/src/components/Message.tsx
+@@ -202,7 +202,7 @@ function BrowserToolResult({
+                   : processedContent.url.replace(/_search$/i, "");
+                 return (
+                   <>
+-                    Search results for <InlineSearchTerm term={term} />
++                    搜索结果: <InlineSearchTerm term={term} />
+                   </>
+                 );
+               })()}
+@@ -326,10 +326,10 @@ function ToolRoleContent({
+                           : "");
+                       return q ? (
+                         <>
+-                          Search results for <InlineSearchTerm term={q} />
++                          搜索结果: <InlineSearchTerm term={q} />
+                         </>
+                       ) : (
+-                        "Web search results"
++                        "联网搜索结果"
+                       );
+                     })()
+                   : toolName === "web_fetch"
+@@ -347,10 +347,10 @@ function ToolRoleContent({
+                             <span className="break-all">{u}</span>
+                           </>
+                         ) : (
+-                          "Web fetch results"
++                          "网页抓取结果"
+                         );
+                       })()
+-                    : "Raw tool result"}
++                    : "工具原始结果"}
+               </span>
+             </div>
+           </div>
+@@ -395,11 +395,11 @@ function cursorToPageText(
+     if (page) {
+       if (page.startsWith("search_results_")) {
+         const searchTerm = page.replace(/^search_results_/, "");
+-        page = `Search results for "${searchTerm}"`;
++        page = `搜索结果: "${searchTerm}"`;
+       }
+       return page;
+     }
+-    return page || "Unknown page";
++    return page || "未知页面";
+   }
+ 
+   if (cursor === undefined) {
+@@ -981,7 +981,7 @@ function OtherRoleMessage({
+               size="md"
+               showLabels={false}
+               className="copy-button z-10 text-neutral-500 dark:text-neutral-400"
+-              title="Copy"
++              title="复制"
+             />
+           </div>
+         )}
+diff --git a/app/ui/app/src/components/ModelPicker.tsx b/app/ui/app/src/components/ModelPicker.tsx
+index 2dba77d..27b9400 100644
+--- a/app/ui/app/src/components/ModelPicker.tsx
++++ b/app/ui/app/src/components/ModelPicker.tsx
+@@ -144,7 +144,7 @@ export const ModelPicker = forwardRef<
+       <button
+         ref={ref}
+         type="button"
+-        title="Select model"
++        title="选择模型"
+         onClick={() => {
+           const newState = !isOpen;
+           setIsOpen(newState);
+@@ -165,8 +165,8 @@ export const ModelPicker = forwardRef<
+         <div className="flex items-center gap-2">
+           <span>
+             {isDisabled
+-              ? "Loading..."
+-              : selectedModel?.model || "Select a model"}
++              ? "加载中..."
++              : selectedModel?.model || "选择一个模型"}
+           </span>
+         </div>
+         <svg
+@@ -191,7 +191,7 @@ export const ModelPicker = forwardRef<
+               type="text"
+               value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
+-              placeholder="Find model..."
++              placeholder="搜索模型..."
+               autoCorrect="off"
+               className="w-full px-2 py-0.5 bg-transparent border-none border-neutral-200 rounded-md outline-none focus:border-neutral-400 dark:border-neutral-600 dark:focus:border-neutral-400"
+             />
+diff --git a/app/ui/app/src/components/Settings.tsx b/app/ui/app/src/components/Settings.tsx
+index 3f0f5c4..fd3edf7 100644
+--- a/app/ui/app/src/components/Settings.tsx
++++ b/app/ui/app/src/components/Settings.tsx
+@@ -246,15 +246,15 @@ export default function Settings() {
+           }, 5000);
+           setPollingInterval(interval);
+         } else {
+-          setConnectionError("Failed to get connect URL");
++          setConnectionError("获取连接地址失败");
+         }
+       }
+     } catch (error) {
+-      console.error("Error connecting to Ollama account:", error);
++      console.error("连接 Ollama 账号出错:", error);
+       setConnectionError(
+         error instanceof Error
+           ? error.message
+-          : "Failed to connect to Ollama account",
++          : "连接 Ollama 账号失败",
+       );
+       setIsAwaitingConnection(false);
+     }
+@@ -267,7 +267,7 @@ export default function Settings() {
+   if (error || !settings) {
+     return (
+       <div className="flex min-h-screen items-center justify-center">
+-        <div className="text-red-500">Failed to load settings</div>
++        <div className="text-red-500">加载设置失败</div>
+       </div>
+     );
+   }
+@@ -349,7 +349,7 @@ export default function Settings() {
+                             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-green-500/20 opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
+                             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"></div>
+                             <span className="relative z-10 flex items-center space-x-2">
+-                              <span>Upgrade</span>
++                              <span>升级</span>
+                             </span>
+                           </Button>
+                         )}
+@@ -388,8 +388,8 @@ export default function Settings() {
+                 ) : (
+                   <div className="flex items-center justify-between">
+                     <div>
+-                      <Label>Ollama account</Label>
+-                      <Description>Not connected</Description>
++                      <Label>Ollama 账号</Label>
++                      <Description>未连接</Description>
+                     </div>
+                     <Button
+                       type="button"
+@@ -400,7 +400,7 @@ export default function Settings() {
+                       {isRefreshing || isAwaitingConnection ? (
+                         <AnimatedDots />
+                       ) : (
+-                        "Sign In"
++                        "登录"
+                       )}
+                     </Button>
+                   </div>
+@@ -423,11 +423,11 @@ export default function Settings() {
+                   <div className="flex items-start space-x-3 flex-1">
+                     <CloudIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
+                     <div>
+-                      <Label>Cloud</Label>
++                      <Label>云端</Label>
+                       <Description>
+                         {cloudOverriddenByEnv
+-                          ? "The OLLAMA_NO_CLOUD environment variable is currently forcing cloud off."
+-                          : "Enable cloud models and web search."}
++                          ? "环境变量 OLLAMA_NO_CLOUD 当前强制关闭了云端功能。"
++                          : "启用云端模型与联网搜索。"}
+                       </Description>
+                     </div>
+                   </div>
+@@ -452,11 +452,11 @@ export default function Settings() {
+                   <div className="flex items-start space-x-3 flex-1">
+                     <ArrowDownTrayIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
+                     <div>
+-                      <Label>Auto-download updates</Label>
++                      <Label>自动下载更新</Label>
+                       <Description>
+                         {settings.AutoUpdateEnabled
+-                          ? "Automatically download updates when available."
+-                          : "Updates will not be downloaded automatically."}
++                          ? "有新版本时自动下载更新。"
++                          : "更新不会自动下载。"}
+                       </Description>
+                     </div>
+                   </div>
+@@ -475,10 +475,8 @@ export default function Settings() {
+                   <div className="flex items-start space-x-3 flex-1">
+                     <WifiIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
+                     <div>
+-                      <Label>Expose Ollama to the network</Label>
+-                      <Description>
+-                        Allow other devices or services to access Ollama.
+-                      </Description>
++                      <Label>允许局域网访问 Ollama</Label>
++                      <Description>允许其他设备或服务访问 Ollama。</Description>
+                     </div>
+                   </div>
+                   <div className="flex-shrink-0">
+@@ -495,8 +493,8 @@ export default function Settings() {
+                 <div className="flex items-start space-x-3">
+                   <FolderIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
+                   <div className="w-full">
+-                    <Label>Model location</Label>
+-                    <Description>Location where models are stored.</Description>
++                    <Label>模型存储位置</Label>
++                    <Description>模型文件的存储位置。</Description>
+                     <div className="mt-2 flex items-center space-x-2">
+                       <Input
+                         value={settings.Models || ""}
+@@ -517,7 +515,7 @@ export default function Settings() {
+                               }
+                             } catch (error) {
+                               console.error(
+-                                "Error selecting models directory:",
++                                "选择模型目录出错:",
+                                 error,
+                               );
+                             }
+@@ -537,7 +535,7 @@ export default function Settings() {
+                 <div className="flex items-start space-x-3">
+                   <CogIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
+                   <div className="w-full">
+-                    <Label>Context length</Label>
++                    <Label>上下文长度</Label>
+                     <Description>
+                       Context length determines how much of your conversation
+                       local LLMs can remember and use to generate responses.
+@@ -575,10 +573,8 @@ export default function Settings() {
+                     <div className="flex items-start space-x-3">
+                       <BoltIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
+                       <div>
+-                        <Label>Enable Agent Mode</Label>
+-                        <Description>
+-                          Use multi-turn tools to fulfill user requests
+-                        </Description>
++                        <Label>启用代理模式</Label>
++                        <Description>使用多轮工具来完成用户请求</Description>
+                       </div>
+                     </div>
+                     <Switch
+@@ -594,10 +590,8 @@ export default function Settings() {
+                     <div className="flex items-start space-x-3">
+                       <WrenchIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
+                       <div>
+-                        <Label>Enable Tools Mode</Label>
+-                        <Description>
+-                          Use single-turn tools to fulfill user requests
+-                        </Description>
++                        <Label>启用工具模式</Label>
++                        <Description>使用单轮工具来完成用户请求</Description>
+                       </div>
+                     </div>
+                     <Switch
+diff --git a/app/ui/app/src/components/ThinkButton.tsx b/app/ui/app/src/components/ThinkButton.tsx
+index ff94026..7400c44 100644
+--- a/app/ui/app/src/components/ThinkButton.tsx
++++ b/app/ui/app/src/components/ThinkButton.tsx
+@@ -8,9 +8,9 @@ const THINKING_LEVELS = {
+ } as const;
+ 
+ const THINKING_LEVEL_LABELS = {
+-  low: "Low",
+-  medium: "Medium",
+-  high: "High",
++  low: "低",
++  medium: "中",
++  high: "高",
+ } as const;
+ 
+ interface ThinkButtonProps {
+@@ -73,7 +73,7 @@ export const ThinkButton = forwardRef<HTMLButtonElement, ThinkButtonProps>(
+       return (
+         <button
+           ref={ref}
+-          title={isActive ? "Disable think mode" : "Enable think mode"}
++          title={isActive ? "关闭思考模式" : "启用思考模式"}
+           onClick={onToggle}
+           className={`select-none flex items-center justify-center rounded-full h-9 w-9 bg-white dark:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all whitespace-nowrap border border-transparent ${
+             isActive
+diff --git a/app/ui/app/src/components/Thinking.tsx b/app/ui/app/src/components/Thinking.tsx
+index e823642..8ddf32a 100644
+--- a/app/ui/app/src/components/Thinking.tsx
++++ b/app/ui/app/src/components/Thinking.tsx
+@@ -130,16 +130,16 @@ export default function Thinking({
+ 
+         <h3 className="ml-6 select-text">
+           {activelyThinking
+-            ? "Thinking..."
++            ? "思考中..."
+             : finishedThinking
+               ? (() => {
+                   const thinkingTime =
+                     (endTime.getTime() - startTime.getTime()) / 1000;
+                   return thinkingTime < 2
+-                    ? "Thought for a moment"
+-                    : `Thought for ${thinkingTime.toFixed(1)} seconds`;
++                    ? "思考了一小会儿"
++                    : `思考了 ${thinkingTime.toFixed(1)} 秒`;
+                 })()
+-              : "Thinking..."}
++              : "思考中..."}
+         </h3>
+       </div>
+       <div
+diff --git a/app/ui/app/src/components/WebSearchButton.tsx b/app/ui/app/src/components/WebSearchButton.tsx
+index e41f120..a60c9e9 100644
+--- a/app/ui/app/src/components/WebSearchButton.tsx
++++ b/app/ui/app/src/components/WebSearchButton.tsx
+@@ -13,7 +13,7 @@ export const WebSearchButton = forwardRef<HTMLButtonElement, ButtonProps>(
+     return (
+       <button
+         ref={ref}
+-        title={isActive ? "Disable web search" : "Enable web search"}
++        title={isActive ? "关闭联网搜索" : "启用联网搜索"}
+         onClick={onToggle}
+         className={`select-none flex items-center justify-center rounded-full h-9 w-9 bg-white dark:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all whitespace-nowrap border border-transparent ${
+           isActive
+diff --git a/app/ui/app/src/components/layout/layout.tsx b/app/ui/app/src/components/layout/layout.tsx
+index bffb057..c2db3e4 100644
+--- a/app/ui/app/src/components/layout/layout.tsx
++++ b/app/ui/app/src/components/layout/layout.tsx
+@@ -23,8 +23,8 @@ export function SidebarLayout({
+             e.stopPropagation();
+           }}
+           className="h-9 w-9 flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700/75 cursor-pointer"
+-          aria-label={settings.sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+-          title={settings.sidebarOpen ? "Hide sidebar" : "Show sidebar"}
++          aria-label={settings.sidebarOpen ? "隐藏侧边栏" : "显示侧边栏"}
++          title={settings.sidebarOpen ? "隐藏侧边栏" : "显示侧边栏"}
+         >
+           <svg
+             className="h-5 w-5 fill-current"
+@@ -38,7 +38,7 @@ export function SidebarLayout({
+         <Link
+           to="/c/$chatId"
+           params={{ chatId: "new" }}
+-          title="New chat"
++          title="新建对话"
+           className={`flex ml-1 items-center justify-center rounded-full transition-opacity duration-375 h-9 w-9 hover:bg-neutral-100 dark:hover:bg-neutral-700 ${
+             settings.sidebarOpen
+               ? "opacity-0 pointer-events-none"
+diff --git a/app/ui/app/src/routes/c.$chatId.tsx b/app/ui/app/src/routes/c.$chatId.tsx
+index fa72ac4..4c293fe 100644
+--- a/app/ui/app/src/routes/c.$chatId.tsx
++++ b/app/ui/app/src/routes/c.$chatId.tsx
+@@ -132,7 +132,7 @@ function RouteComponent() {
+   if (chatLoading) {
+     return (
+       <SidebarLayout sidebar={<ChatSidebar currentChatId={chatId} />}>
+-        <div className="p-4">Loading chat...</div>
++        <div className="p-4">正在加载对话...</div>
+       </SidebarLayout>
+     );
+   }
+@@ -140,7 +140,7 @@ function RouteComponent() {
+   if (chatError) {
+     return (
+       <SidebarLayout sidebar={<ChatSidebar currentChatId={chatId} />}>
+-        <div className="p-4 text-red-500">Error loading chat</div>
++        <div className="p-4 text-red-500">加载对话失败</div>
+       </SidebarLayout>
+     );
+   }
+@@ -148,7 +148,7 @@ function RouteComponent() {
+   if (!chatData) {
+     return (
+       <SidebarLayout sidebar={<ChatSidebar currentChatId={chatId} />}>
+-        <div className="p-4">Chat not found</div>
++        <div className="p-4">未找到对话</div>
+       </SidebarLayout>
+     );
+   }
+diff --git a/app/ui/app/src/utils/fileValidation.test.ts b/app/ui/app/src/utils/fileValidation.test.ts
+index d5a2205..938c849 100644
+--- a/app/ui/app/src/utils/fileValidation.test.ts
++++ b/app/ui/app/src/utils/fileValidation.test.ts
+@@ -68,7 +68,7 @@ describe("fileValidation", () => {
+         maxFileSize: 10, // 10MB limit
+       });
+       expect(result.valid).toBe(false);
+-      expect(result.error).toBe("File too large");
++      expect(result.error).toBe("文件过大");
+     });
+ 
+     it("should reject unsupported file types", () => {
+@@ -77,7 +77,7 @@ describe("fileValidation", () => {
+         hasVisionCapability: true,
+       });
+       expect(result.valid).toBe(false);
+-      expect(result.error).toBe("File type not supported");
++      expect(result.error).toBe("不支持的文件类型");
+     });
+ 
+     it("should respect custom validators", () => {
+diff --git a/app/ui/app/src/utils/fileValidation.ts b/app/ui/app/src/utils/fileValidation.ts
+index d7a01a1..56b1759 100644
+--- a/app/ui/app/src/utils/fileValidation.ts
++++ b/app/ui/app/src/utils/fileValidation.ts
+@@ -79,12 +79,12 @@ export function validateFile(
+ 
+   // File extension validation
+   if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+-    return { valid: false, error: "File type not supported" };
++    return { valid: false, error: "不支持的文件类型" };
+   }
+ 
+   // File size validation
+   if (file.size > MAX_FILE_SIZE) {
+-    return { valid: false, error: "File too large" };
++    return { valid: false, error: "文件过大" };
+   }
+ 
+   return { valid: true };
+@@ -140,7 +140,7 @@ export async function processFiles(
+       console.error(`Error reading file ${file.name}:`, error);
+       errors.push({
+         filename: file.name,
+-        error: "Error reading file",
++        error: "读取文件失败",
+       });
+     }
+   }
+diff --git a/app/ui/ui.go b/app/ui/ui.go
+index 658d795..5f5c80d 100644
+--- a/app/ui/ui.go
++++ b/app/ui/ui.go
+@@ -152,7 +152,7 @@ func (s *Server) ollamaProxy() http.Handler {
+ 				if err != nil {
+ 					proxyMu.Unlock()
+ 					s.log().Error("ollama server not ready after retries", "error", err)
+-					http.Error(w, "Ollama server is not ready", http.StatusServiceUnavailable)
++					http.Error(w, "Ollama 服务未就绪", http.StatusServiceUnavailable)
+ 					return
+ 				}
+ 
+@@ -209,13 +209,13 @@ func (s *Server) Handler() http.Handler {
+ 				cookie, err := r.Cookie("token")
+ 				if err != nil {
+ 					w.WriteHeader(http.StatusForbidden)
+-					json.NewEncoder(w).Encode(map[string]string{"error": "Token is required"})
++					json.NewEncoder(w).Encode(map[string]string{"error": "需要登录令牌"})
+ 					return
+ 				}
+ 
+ 				if cookie.Value != s.Token {
+ 					w.WriteHeader(http.StatusForbidden)
+-					json.NewEncoder(w).Encode(map[string]string{"error": "Token is required"})
++					json.NewEncoder(w).Encode(map[string]string{"error": "需要登录令牌"})
+ 					return
+ 				}
+ 			}
+@@ -541,7 +541,7 @@ func (s *Server) getError(err error) responses.ErrorEvent {
+ 	if errors.As(err, &sErr) && sErr.StatusCode == http.StatusUnauthorized {
+ 		return responses.ErrorEvent{
+ 			EventName: "error",
+-			Error:     "Could not verify you are signed in. Please sign in and try again.",
++			Error:     "无法确认你的登录状态,请登录后重试。",
+ 			Code:      "cloud_unauthorized",
+ 		}
+ 	}
+@@ -552,19 +552,19 @@ func (s *Server) getError(err error) responses.ErrorEvent {
+ 	case strings.Contains(errStr, "402"):
+ 		return responses.ErrorEvent{
+ 			EventName: "error",
+-			Error:     "You've reached your usage limit, please upgrade to continue",
++			Error:     "你已达到使用限制,请升级后继续使用",
+ 			Code:      "usage_limit_upgrade",
+ 		}
+ 	case strings.HasPrefix(errStr, "pull model manifest") && isNetworkError(errStr):
+ 		return responses.ErrorEvent{
+ 			EventName: "error",
+-			Error:     "Unable to download model. Please check your internet connection to download the model for offline use.",
++			Error:     "无法下载模型。请检查网络连接后重新下载,以便离线使用。",
+ 			Code:      "offline_download_error",
+ 		}
+ 	case errors.Is(err, ErrNetworkOffline) || strings.Contains(errStr, "operation timed out"):
+ 		return responses.ErrorEvent{
+ 			EventName: "error",
+-			Error:     "Connection lost",
++			Error:     "连接已断开",
+ 			Code:      "turbo_connection_lost",
+ 		}
+ 	}
+diff --git a/app/wintray/messages.go b/app/wintray/messages.go
+index 12f6af0..8da790a 100644
+--- a/app/wintray/messages.go
++++ b/app/wintray/messages.go
+@@ -3,15 +3,15 @@
+ package wintray
+ 
+ const (
+-	firstTimeTitle   = "Ollama is running"
+-	firstTimeMessage = "Click here to get started"
+-	updateTitle      = "Update available"
+-	updateMessage    = "Ollama version %s is ready to install"
++	firstTimeTitle   = "Ollama 正在运行"
++	firstTimeMessage = "点击此处开始使用"
++	updateTitle      = "发现新版本"
++	updateMessage    = "Ollama %s 版本已准备好安装"
+ 
+-	quitMenuTitle            = "Quit Ollama"
+-	updateAvailableMenuTitle = "An update is available"
+-	updateMenuTitle          = "Restart to update"
+-	diagLogsMenuTitle        = "View logs"
+-	openUIMenuTitle          = "Open Ollama"
+-	settingsUIMenuTitle      = "Settings..."
++	quitMenuTitle            = "退出 Ollama"
++	updateAvailableMenuTitle = "有可用更新"
++	updateMenuTitle          = "重启以更新"
++	diagLogsMenuTitle        = "查看日志"
++	openUIMenuTitle          = "打开 Ollama"
++	settingsUIMenuTitle      = "设置..."
+ )

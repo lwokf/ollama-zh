@@ -1,0 +1,173 @@
+# Ollama 汉化补丁自动构建流水线
+#
+# 触发方式:
+#   1. workflow_dispatch(手动):填上游版本号(如 v0.32.5),或留空自动检测最新 Release
+#   2. schedule:每天 04:00 自动检测上游是否有新版本,有则自动构建发布
+#
+# 流程: 检测版本 -> 克隆上游对应 tag -> 应用汉化补丁(translations/zh-CN.patch)
+#        -> 构建前端(npm) -> 编译桌面端(go + mingw) -> 打包 zip -> 发布 Release
+
+name: Build Ollama Hanhua
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Ollama 上游版本号(如 v0.32.5),留空则自动检测最新版"
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 4 * * *"
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-zh
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 确定目标版本
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          V="${{ github.event.inputs.version }}"
+          if [ -z "$V" ]; then
+            V=$(curl -sS https://api.github.com/repos/ollama/ollama/releases/latest \
+              | python -c "import sys,json;print(json.load(sys.stdin)['tag_name'])")
+          fi
+          V="${V#v}"
+          V="v${V}"
+          echo "VERSION=${V}" >> "$GITHUB_OUTPUT"
+          echo "target version: ${V}"
+
+      - name: 检查是否已构建过该版本(定时触发时跳过)
+        id: check-existing
+        shell: bash
+        run: |
+          TAG="zh-${{ steps.version.outputs.VERSION }}"
+          if gh release view "${TAG}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "release ${TAG} already exists, skipping"
+            echo "SKIP=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "SKIP=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 克隆上游源码
+        if: steps.check-existing.outputs.SKIP != 'true'
+        shell: bash
+        run: |
+          git clone --depth 1 --branch ${{ steps.version.outputs.VERSION }} \
+            https://github.com/ollama/ollama.git upstream
+
+      - name: 应用汉化补丁
+        if: steps.check-existing.outputs.SKIP != 'true'
+        shell: bash
+        run: |
+          git -C upstream apply --check ../translations/zh-CN.patch
+          git -C upstream apply ../translations/zh-CN.patch
+          echo "patch applied"
+
+      - name: 安装 Node.js
+        if: steps.check-existing.outputs.SKIP != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 构建前端(go:embed 需要 dist)
+        if: steps.check-existing.outputs.SKIP != 'true'
+        shell: bash
+        run: |
+          cd upstream/app/ui/app
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: 安装 Go
+        if: steps.check-existing.outputs.SKIP != 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: upstream/go.mod
+
+      - name: 安装 MinGW(CGO 编译 webview)
+        if: steps.check-existing.outputs.SKIP != 'true'
+        shell: bash
+        run: |
+          choco install mingw -y --no-progress
+          gcc --version | head -1
+          g++ --version | head -1
+
+      - name: 编译汉化版 ollama app.exe
+        if: steps.check-existing.outputs.SKIP != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="/c/ProgramData/chocolatey/bin:$PATH"
+          cd upstream
+          CGO_ENABLED=1 go build -trimpath \
+            -ldflags "-s -w -H windowsgui -X=github.com/ollama/ollama/app/version.Version=${{ steps.version.outputs.VERSION }}" \
+            -o ../ollama-app-zh.exe ./app/cmd/app/
+          ls -lh ../ollama-app-zh.exe
+
+      - name: 打包补丁 zip
+        if: steps.check-existing.outputs.SKIP != 'true'
+        shell: pwsh
+        run: |
+          $ver = "${{ steps.version.outputs.VERSION }}"
+          $dir = "ollama-zh-$ver"
+          New-Item -ItemType Directory -Path $dir | Out-Null
+          Copy-Item ollama-app-zh.exe "$dir\ollama app.exe"
+          Copy-Item scripts\apply-patch.ps1 $dir\
+          Copy-Item README.md "$dir\README-使用说明.md" -ErrorAction SilentlyContinue
+          Compress-Archive -Path $dir -DestinationPath "$dir-win64.zip" -Force
+          Get-ChildItem "ollama-zh-*.zip" | Select-Object Name, Length
+
+      - name: 上传构建产物(Artifact)
+        if: steps.check-existing.outputs.SKIP != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ollama-zh-${{ steps.version.outputs.VERSION }}
+          path: ollama-zh-*.zip
+          retention-days: 30
+
+      - name: 发布 Release
+        if: steps.check-existing.outputs.SKIP != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: zh-${{ steps.version.outputs.VERSION }}
+          name: Ollama 汉化补丁 ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## Ollama 汉化补丁 ${{ steps.version.outputs.VERSION }}
+
+            ### 使用方法
+            1. 退出正在运行的 Ollama(托盘图标右键 → 退出 Ollama)
+            2. 解压本 zip,右键"以管理员身份运行 PowerShell",执行:
+               ```powershell
+               .\apply-patch.ps1
+               ```
+            3. 重新启动 Ollama,界面即为中文
+
+            ### 升级后如何恢复中文
+            官方更新(自动更新或重装)会覆盖汉化版 exe,更新完成后**重新运行一次 apply-patch.ps1 即可**。
+
+            ### 还原官方原版
+            ```powershell
+            .\apply-patch.ps1 -Restore
+            ```
+
+            ### 说明
+            - 仅替换 `ollama app.exe`(桌面端 UI),服务端 `ollama.exe` 保持官方原版
+            - 首次应用自动备份官方 exe(`ollama app.exe.official.bak`)
+            - 汉化来源:本仓库 `translations/zh-CN.patch`(可复现、可审查)
+          files: ollama-zh-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

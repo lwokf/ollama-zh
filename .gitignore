@@ -1,0 +1,8 @@
+# 本地克隆的上游源码(不推送)
+upstream/
+# 构建/验证工作目录
+work/
+# 临时文件
+strings_raw.txt
+node_modules/
+*.log

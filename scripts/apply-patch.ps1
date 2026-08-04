@@ -76,7 +76,12 @@ if (-not (Test-Path $zhExe)) {
 # 还原模式
 if ($Restore) {
     if (-not (Test-Path $backup)) {
-        Write-Host "[错误] 未找到官方备份文件,无法还原" -ForegroundColor Red
+        Write-Host "[提示] 未找到官方备份文件:$backup" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "原因:你还没有应用过汉化补丁,所以没有备份。" -ForegroundColor White
+        Write-Host "请先双击 apply-patch.cmd 应用汉化(应用时会自动备份官方 exe)," -ForegroundColor Cyan
+        Write-Host "以后想还原时再双击 restore-official.cmd。" -ForegroundColor Cyan
+        Write-Host "如果当前 exe 本来就是官方原版(界面为英文),则无需还原。" -ForegroundColor Cyan
         exit 1
     }
     Get-Process | Where-Object { $_.ProcessName -like "ollama*" } | Stop-Process -Force -ErrorAction SilentlyContinue

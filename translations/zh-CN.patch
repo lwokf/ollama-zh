@@ -431,7 +431,7 @@ index 4ebbeec..e234621 100644
  
        <div className="flex items-start ml-[1.8rem] mt-2">
 diff --git a/app/ui/app/src/components/LaunchCommands.tsx b/app/ui/app/src/components/LaunchCommands.tsx
-index dcf2ab9..b19bedc 100644
+index e050681..e72b1df 100644
 --- a/app/ui/app/src/components/LaunchCommands.tsx
 +++ b/app/ui/app/src/components/LaunchCommands.tsx
 @@ -17,7 +17,7 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
@@ -505,6 +505,15 @@ index dcf2ab9..b19bedc 100644
      icon: "/launch-icons/droid.svg",
    },
    {
+     id: "dsh",
+     name: "DeepSeek Harness",
+     command: "ollama launch dsh",
+-    description: "DeepSeek's open-source agent harness",
++    description: "DeepSeek 的开源代理框架",
+     icon: "/launch-icons/deepseek-harness.svg",
+     iconClassName: "h-7 w-7",
+   },
+@@ -89,7 +89,7 @@ const LAUNCH_COMMANDS: LaunchCommand[] = [
      id: "pi",
      name: "Pi",
      command: "ollama launch pi",
@@ -513,7 +522,7 @@ index dcf2ab9..b19bedc 100644
      icon: "/launch-icons/pi.svg",
      darkIcon: "/launch-icons/pi-dark.svg",
      iconClassName: "h-7 w-7",
-@@ -123,7 +123,7 @@ export default function LaunchCommands() {
+@@ -131,7 +131,7 @@ export default function LaunchCommands() {
              <CopyButton
                content={item.command}
                size="md"
@@ -522,7 +531,7 @@ index dcf2ab9..b19bedc 100644
                className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-200/60 dark:hover:bg-neutral-700/70"
                onCopy={() => {
                  setSettings({ LastHomeView: item.id }).catch(() => { });
-@@ -141,12 +141,8 @@ export default function LaunchCommands() {
+@@ -149,12 +149,8 @@ export default function LaunchCommands() {
          className={`flex-1 overflow-y-auto overscroll-contain relative min-h-0 ${isWindows ? "xl:pt-4" : "xl:pt-8"}`}
        >
          <div className="max-w-[730px] mx-auto w-full px-4 pt-4 pb-20 sm:px-6 sm:pt-6 sm:pb-24 lg:px-8 lg:pt-8 lg:pb-28">

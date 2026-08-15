@@ -2,6 +2,8 @@
 upstream/
 # 构建/验证工作目录
 work/
+# 汉化交付目录(exe 统一走 Release 发布,不入仓库)
+/ollama-zh-v*/
 # 临时文件
 strings_raw.txt
 node_modules/

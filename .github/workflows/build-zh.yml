@@ -19,7 +19,7 @@ on:
   schedule:
     - cron: "0 4 * * *"
   push:
-    branches: [main]
+    branches: [master]
 
 permissions:
   contents: write
@@ -68,12 +68,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 克隆上游源码
+      - name: 克隆上游源码(带重试)
         if: steps.check-existing.outputs.SKIP != 'true'
         shell: bash
         run: |
-          git clone --depth 1 --branch ${{ steps.version.outputs.VERSION }} \
-            https://github.com/ollama/ollama.git upstream
+          # GitHub 克隆偶发网络失败,重试 3 次
+          for i in 1 2 3; do
+            git clone --depth 1 --branch ${{ steps.version.outputs.VERSION }} \
+              https://github.com/ollama/ollama.git upstream && break
+            echo "clone attempt $i failed, retrying in 10s..."
+            rm -rf upstream
+            sleep 10
+          done
+          test -d upstream/.git
 
       - name: 应用汉化补丁
         if: steps.check-existing.outputs.SKIP != 'true'

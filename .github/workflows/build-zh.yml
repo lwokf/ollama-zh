@@ -204,6 +204,6 @@ jobs:
             - 首次应用自动备份官方 exe(`ollama app.exe.official.bak`)
             - 汉化来源:本仓库 `translations/zh-CN.patch`(可复现、可审查)
           files: ollama-zh-*.zip
-          overwrite: true
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

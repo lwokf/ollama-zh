@@ -320,7 +320,7 @@ index b0ae1af..02d6d67 100644
                    <PlusIcon className="w-4.5 h-4.5 stroke-2 text-neutral-500 dark:text-neutral-400" />
                  </button>
 diff --git a/app/ui/app/src/components/ChatSidebar.tsx b/app/ui/app/src/components/ChatSidebar.tsx
-index 2d1b07a..17a9707 100644
+index 2d1b07a..47e04cc 100644
 --- a/app/ui/app/src/components/ChatSidebar.tsx
 +++ b/app/ui/app/src/components/ChatSidebar.tsx
 @@ -158,16 +158,16 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
@@ -407,6 +407,17 @@ index 2d1b07a..17a9707 100644
            </Link>
          )}
        </header>
+@@ -379,9 +379,7 @@ export function ChatSidebar({ currentChatId }: ChatSidebarProps) {
+                           chat.createdAt.toLocaleString()}
+                       </span>
+                       {copiedChatId === chat.id && (
+-                        <span className="ml-2 text-xs text-green-600 dark:text-green-400">
+-                          Copied!
+-                        </span>
++                        <span className="ml-2 text-xs text-green-600 dark:text-green-400">已复制!</span>
+                       )}
+                     </Link>
+                   )}
 diff --git a/app/ui/app/src/components/CopyButton.tsx b/app/ui/app/src/components/CopyButton.tsx
 index e43a500..eb28b6e 100644
 --- a/app/ui/app/src/components/CopyButton.tsx
@@ -541,6 +552,20 @@ index 4ebbeec..e234621 100644
        </div>
  
        <div className="flex items-start ml-[1.8rem] mt-2">
+diff --git a/app/ui/app/src/components/FileUpload.tsx b/app/ui/app/src/components/FileUpload.tsx
+index 8baea91..e5fd705 100644
+--- a/app/ui/app/src/components/FileUpload.tsx
++++ b/app/ui/app/src/components/FileUpload.tsx
+@@ -239,8 +239,7 @@ export function FileUpload({
+             <div className="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl rounded-2xl p-12 mx-4 max-w-sm text-center border border-neutral-200/50 dark:border-neutral-700/50 shadow-2xl">
+               <DocumentPlusIcon className="w-8 h-8 mx-auto mb-2 text-black dark:text-white" />
+               <p className="text-neutral-500 dark:text-neutral-400 text-sm font-medium leading-relaxed">
+-                Drop files here or paste from clipboard to add them to your
+-                message
++                将文件拖到此处,或从剪贴板粘贴以添加到消息中
+               </p>
+             </div>
+           </div>
 diff --git a/app/ui/app/src/components/LaunchCommands.tsx b/app/ui/app/src/components/LaunchCommands.tsx
 index e050681..e72b1df 100644
 --- a/app/ui/app/src/components/LaunchCommands.tsx
@@ -658,7 +683,7 @@ index e050681..e72b1df 100644
            <div className="mt-6 grid gap-7">
              {LAUNCH_COMMANDS.map(renderCommandCard)}
 diff --git a/app/ui/app/src/components/Message.tsx b/app/ui/app/src/components/Message.tsx
-index 7e5d3a7..e0b11e8 100644
+index 7e5d3a7..08da2b5 100644
 --- a/app/ui/app/src/components/Message.tsx
 +++ b/app/ui/app/src/components/Message.tsx
 @@ -202,7 +202,7 @@ function BrowserToolResult({
@@ -683,7 +708,12 @@ index 7e5d3a7..e0b11e8 100644
                        );
                      })()
                    : toolName === "web_fetch"
-@@ -347,10 +347,10 @@ function ToolRoleContent({
+@@ -343,14 +343,14 @@ function ToolRoleContent({
+                             : "");
+                         return u ? (
+                           <>
+-                            Fetch results for{" "}
++                            网页抓取结果: {" "}
                              <span className="break-all">{u}</span>
                            </>
                          ) : (
@@ -710,6 +740,60 @@ index 7e5d3a7..e0b11e8 100644
    }
  
    if (cursor === undefined) {
+@@ -444,7 +444,7 @@ function BrowserToolCallDisplay({
+           <path d="M0 7.01367C0 10.8809 3.14648 14.0273 7.01367 14.0273C8.54297 14.0273 9.94043 13.5352 11.0918 12.709L15.416 17.042C15.6182 17.2441 15.8818 17.3408 16.1631 17.3408C16.7607 17.3408 17.1738 16.8926 17.1738 16.3037C17.1738 16.0225 17.0684 15.7676 16.8838 15.583L12.5859 11.2588C13.4912 10.0811 14.0273 8.61328 14.0273 7.01367C14.0273 3.14648 10.8809 0 7.01367 0C3.14648 0 0 3.14648 0 7.01367ZM1.50293 7.01367C1.50293 3.97266 3.97266 1.50293 7.01367 1.50293C10.0547 1.50293 12.5244 3.97266 12.5244 7.01367C12.5244 10.0547 10.0547 12.5244 7.01367 12.5244C3.97266 12.5244 1.50293 10.0547 1.50293 7.01367Z" />
+         </svg>
+         <div className="ml-6">
+-          Searching for <InlineSearchTerm term={query} />
++          正在搜索: <InlineSearchTerm term={query} />
+           &#8230;
+         </div>
+       </div>
+@@ -465,7 +465,7 @@ function BrowserToolCallDisplay({
+             <path d="M0 7.01367C0 10.8809 3.14648 14.0273 7.01367 14.0273C8.54297 14.0273 9.94043 13.5352 11.0918 12.709L15.416 17.042C15.6182 17.2441 15.8818 17.3408 16.1631 17.3408C16.7607 17.3408 17.1738 16.8926 17.1738 16.3037C17.1738 16.0225 17.0684 15.7676 16.8838 15.583L12.5859 11.2588C13.4912 10.0811 14.0273 8.61328 14.0273 7.01367C14.0273 3.14648 10.8809 0 7.01367 0C3.14648 0 0 3.14648 0 7.01367ZM1.50293 7.01367C1.50293 3.97266 3.97266 1.50293 7.01367 1.50293C10.0547 1.50293 12.5244 3.97266 12.5244 7.01367C12.5244 10.0547 10.0547 12.5244 7.01367 12.5244C3.97266 12.5244 1.50293 10.0547 1.50293 7.01367Z" />
+           </svg>
+           <div className="ml-6">
+-            Opening link #{id} from {cursorToPage(cursor, browserToolResult)}
++            正在打开链接 #{id}:{cursorToPage(cursor, browserToolResult)}
+           </div>
+         </div>
+       );
+@@ -505,7 +505,7 @@ function BrowserToolCallDisplay({
+           <path d="M0 7.01367C0 10.8809 3.14648 14.0273 7.01367 14.0273C8.54297 14.0273 9.94043 13.5352 11.0918 12.709L15.416 17.042C15.6182 17.2441 15.8818 17.3408 16.1631 17.3408C16.7607 17.3408 17.1738 16.8926 17.1738 16.3037C17.1738 16.0225 17.0684 15.7676 16.8838 15.583L12.5859 11.2588C13.4912 10.0811 14.0273 8.61328 14.0273 7.01367C14.0273 3.14648 10.8809 0 7.01367 0C3.14648 0 0 3.14648 0 7.01367ZM1.50293 7.01367C1.50293 3.97266 3.97266 1.50293 7.01367 1.50293C10.0547 1.50293 12.5244 3.97266 12.5244 7.01367C12.5244 10.0547 10.0547 12.5244 7.01367 12.5244C3.97266 12.5244 1.50293 10.0547 1.50293 7.01367Z" />
+         </svg>
+         <div className="ml-6">
+-          Searching for <InlineSearchTerm term={pattern} /> on{" "}
++          正在搜索: <InlineSearchTerm term={pattern} /> on{" "}
+           {cursorToPage(cursor, browserToolResult)}
+         </div>
+       </div>
+@@ -551,7 +551,7 @@ function ToolCallDisplay({
+           <path d="M0 7.01367C0 10.8809 3.14648 14.0273 7.01367 14.0273C8.54297 14.0273 9.94043 13.5352 11.0918 12.709L15.416 17.042C15.6182 17.2441 15.8818 17.3408 16.1631 17.3408C16.7607 17.3408 17.1738 16.8926 17.1738 16.3037C17.1738 16.0225 17.0684 15.7676 16.8838 15.583L12.5859 11.2588C13.4912 10.0811 14.0273 8.61328 14.0273 7.01367C14.0273 3.14648 10.8809 0 7.01367 0C3.14648 0 0 3.14648 0 7.01367ZM1.50293 7.01367C1.50293 3.97266 3.97266 1.50293 7.01367 1.50293C10.0547 1.50293 12.5244 3.97266 12.5244 7.01367C12.5244 10.0547 10.0547 12.5244 7.01367 12.5244C3.97266 12.5244 1.50293 10.0547 1.50293 7.01367Z" />
+         </svg>
+         <div className="ml-6">
+-          Searching for <InlineSearchTerm term={query} />
++          正在搜索: <InlineSearchTerm term={query} />
+           &#8230;
+         </div>
+       </div>
+@@ -577,7 +577,7 @@ function ToolCallDisplay({
+           <path d="M0 7.01367C0 10.8809 3.14648 14.0273 7.01367 14.0273C8.54297 14.0273 9.94043 13.5352 11.0918 12.709L15.416 17.042C15.6182 17.2441 15.8818 17.3408 16.1631 17.3408C16.7607 17.3408 17.1738 16.8926 17.1738 16.3037C17.1738 16.0225 17.0684 15.7676 16.8838 15.583L12.5859 11.2588C13.4912 10.0811 14.0273 8.61328 14.0273 7.01367C14.0273 3.14648 10.8809 0 7.01367 0C3.14648 0 0 3.14648 0 7.01367ZM1.50293 7.01367C1.50293 3.97266 3.97266 1.50293 7.01367 1.50293C10.0547 1.50293 12.5244 3.97266 12.5244 7.01367C12.5244 10.0547 10.0547 12.5244 7.01367 12.5244C3.97266 12.5244 1.50293 10.0547 1.50293 7.01367Z" />
+         </svg>
+         <div className="ml-6">
+-          Fetching for <InlineSearchTerm term={url} />
++          正在抓取: <InlineSearchTerm term={url} />
+           &#8230;
+         </div>
+       </div>
+@@ -624,7 +624,7 @@ function ToolCallDisplay({
+           <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+         </svg>
+         <div className="ml-6">
+-          Calling <span className="font-mono">{toolCall.function.name}</span>
++          正在调用 <span className="font-mono">{toolCall.function.name}</span>
+           {preview ? (
+             <>
+               : <InlineSearchTerm term={preview} />
 @@ -981,7 +981,7 @@ function OtherRoleMessage({
                size="md"
                showLabels={false}
@@ -720,7 +804,7 @@ index 7e5d3a7..e0b11e8 100644
            </div>
          )}
 diff --git a/app/ui/app/src/components/ModelPicker.tsx b/app/ui/app/src/components/ModelPicker.tsx
-index 2dba77d..27b9400 100644
+index 2dba77d..aba0d11 100644
 --- a/app/ui/app/src/components/ModelPicker.tsx
 +++ b/app/ui/app/src/components/ModelPicker.tsx
 @@ -144,7 +144,7 @@ export const ModelPicker = forwardRef<
@@ -752,8 +836,19 @@ index 2dba77d..27b9400 100644
                autoCorrect="off"
                className="w-full px-2 py-0.5 bg-transparent border-none border-neutral-200 rounded-md outline-none focus:border-neutral-400 dark:border-neutral-600 dark:focus:border-neutral-400"
              />
+@@ -300,9 +300,7 @@ export const ModelList = forwardRef(function ModelList(
+       className="h-64 overflow-y-auto overflow-x-hidden"
+     >
+       {models.length === 0 ? (
+-        <div className="px-3 py-2 text-neutral-500 dark:text-neutral-400">
+-          No models found
+-        </div>
++        <div className="px-3 py-2 text-neutral-500 dark:text-neutral-400">未找到模型</div>
+       ) : (
+         models.map((model, index) => {
+           return (
 diff --git a/app/ui/app/src/components/Settings.tsx b/app/ui/app/src/components/Settings.tsx
-index 3f0f5c4..fd3edf7 100644
+index 3f0f5c4..6eba774 100644
 --- a/app/ui/app/src/components/Settings.tsx
 +++ b/app/ui/app/src/components/Settings.tsx
 @@ -246,15 +246,15 @@ export default function Settings() {
@@ -784,6 +879,15 @@ index 3f0f5c4..fd3edf7 100644
        </div>
      );
    }
+@@ -296,7 +296,7 @@ export default function Settings() {
+               <ArrowLeftIcon className="w-5 h-5 dark:text-white" />
+             </button>
+           )}
+-          Settings
++          设置
+         </h1>
+         {!isWindows && (
+           <button
 @@ -349,7 +349,7 @@ export default function Settings() {
                              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-green-500/20 opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out"></div>
@@ -793,7 +897,27 @@ index 3f0f5c4..fd3edf7 100644
                              </span>
                            </Button>
                          )}
-@@ -388,8 +388,8 @@ export default function Settings() {
+@@ -360,17 +360,13 @@ export default function Settings() {
+                           onClick={() =>
+                             window.open("https://ollama.com/settings", "_blank")
+                           }
+-                        >
+-                          Manage
+-                        </Button>
++                        >管理</Button>
+                         <Button
+                           type="button"
+                           color="zinc"
+                           className="px-3 py-2 text-sm"
+                           onClick={() => disconnectUser()}
+-                        >
+-                          Sign out
+-                        </Button>
++                        >退出登录</Button>
+                       </div>
+                     </div>
+                     {user?.avatarurl && (
+@@ -388,8 +384,8 @@ export default function Settings() {
                  ) : (
                    <div className="flex items-center justify-between">
                      <div>
@@ -804,7 +928,7 @@ index 3f0f5c4..fd3edf7 100644
                      </div>
                      <Button
                        type="button"
-@@ -400,7 +400,7 @@ export default function Settings() {
+@@ -400,7 +396,7 @@ export default function Settings() {
                        {isRefreshing || isAwaitingConnection ? (
                          <AnimatedDots />
                        ) : (
@@ -813,7 +937,7 @@ index 3f0f5c4..fd3edf7 100644
                        )}
                      </Button>
                    </div>
-@@ -423,11 +423,11 @@ export default function Settings() {
+@@ -423,11 +419,11 @@ export default function Settings() {
                    <div className="flex items-start space-x-3 flex-1">
                      <CloudIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
                      <div>
@@ -828,7 +952,7 @@ index 3f0f5c4..fd3edf7 100644
                        </Description>
                      </div>
                    </div>
-@@ -452,11 +452,11 @@ export default function Settings() {
+@@ -452,11 +448,11 @@ export default function Settings() {
                    <div className="flex items-start space-x-3 flex-1">
                      <ArrowDownTrayIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
                      <div>
@@ -843,7 +967,7 @@ index 3f0f5c4..fd3edf7 100644
                        </Description>
                      </div>
                    </div>
-@@ -475,10 +475,8 @@ export default function Settings() {
+@@ -475,10 +471,8 @@ export default function Settings() {
                    <div className="flex items-start space-x-3 flex-1">
                      <WifiIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
                      <div>
@@ -856,7 +980,7 @@ index 3f0f5c4..fd3edf7 100644
                      </div>
                    </div>
                    <div className="flex-shrink-0">
-@@ -495,8 +493,8 @@ export default function Settings() {
+@@ -495,8 +489,8 @@ export default function Settings() {
                  <div className="flex items-start space-x-3">
                    <FolderIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
                    <div className="w-full">
@@ -867,7 +991,7 @@ index 3f0f5c4..fd3edf7 100644
                      <div className="mt-2 flex items-center space-x-2">
                        <Input
                          value={settings.Models || ""}
-@@ -517,7 +515,7 @@ export default function Settings() {
+@@ -517,16 +511,14 @@ export default function Settings() {
                                }
                              } catch (error) {
                                console.error(
@@ -876,16 +1000,31 @@ index 3f0f5c4..fd3edf7 100644
                                  error,
                                );
                              }
-@@ -537,7 +535,7 @@ export default function Settings() {
+                           }
+                         }}
+                       >
+-                        <FolderIcon className="w-4 h-4 mr-1" />
+-                        Browse
+-                      </Button>
++                        <FolderIcon className="w-4 h-4 mr-1" />浏览</Button>
+                     </div>
+                   </div>
+                 </div>
+@@ -537,11 +529,8 @@ export default function Settings() {
                  <div className="flex items-start space-x-3">
                    <CogIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
                    <div className="w-full">
 -                    <Label>Context length</Label>
+-                    <Description>
+-                      Context length determines how much of your conversation
+-                      local LLMs can remember and use to generate responses.
+-                    </Description>
 +                    <Label>上下文长度</Label>
-                     <Description>
-                       Context length determines how much of your conversation
-                       local LLMs can remember and use to generate responses.
-@@ -575,10 +573,8 @@ export default function Settings() {
++                    <Description>上下文长度决定了本地大模型能记住并使用多少对话内容来生成回复。<//Description>
+                     <div className="mt-3">
+                       <Slider
+                         value={settings.ContextLength || defaultContextLength || 0}
+@@ -575,10 +564,8 @@ export default function Settings() {
                      <div className="flex items-start space-x-3">
                        <BoltIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
                        <div>
@@ -898,7 +1037,7 @@ index 3f0f5c4..fd3edf7 100644
                        </div>
                      </div>
                      <Switch
-@@ -594,10 +590,8 @@ export default function Settings() {
+@@ -594,10 +581,8 @@ export default function Settings() {
                      <div className="flex items-start space-x-3">
                        <WrenchIcon className="mt-1 h-5 w-5 flex-shrink-0 text-black dark:text-neutral-100" />
                        <div>
@@ -911,6 +1050,28 @@ index 3f0f5c4..fd3edf7 100644
                        </div>
                      </div>
                      <Switch
+@@ -617,9 +602,7 @@ export default function Settings() {
+               color="white"
+               className="px-3"
+               onClick={handleResetToDefaults}
+-            >
+-              Reset to defaults
+-            </Button>
++            >恢复默认设置</Button>
+           </div>
+         </div>
+ 
+@@ -629,9 +612,7 @@ export default function Settings() {
+             <Badge
+               color="green"
+               className="!bg-green-500 !text-white dark:!bg-green-600"
+-            >
+-              Saved
+-            </Badge>
++            >已保存</Badge>
+           </div>
+         )}
+       </div>
 diff --git a/app/ui/app/src/components/ThinkButton.tsx b/app/ui/app/src/components/ThinkButton.tsx
 index ff94026..7400c44 100644
 --- a/app/ui/app/src/components/ThinkButton.tsx

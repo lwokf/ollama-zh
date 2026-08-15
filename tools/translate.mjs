@@ -41,14 +41,36 @@ for (const [en, zh] of Object.entries(dict)) {
 // (multi-line JSX text, template literals with interpolation, JSX fragments).
 const specialRules = [
   // Settings -> Context length description (JSX text spans multiple source lines)
+  // 注意:> 与文本之间可能跨行,必须用 \s* 连接,否则 v0.32.13 起的多行写法匹配不到
   [
-    />Context\s+length\s+determines\s+how\s+much\s+of\s+your\s+conversation[\s\S]*?local\s+LLMs\s+can\s+remember\s+and\s+use\s+to\s+generate\s+responses\.\s*</g,
+    />\s*Context\s+length\s+determines\s+how\s+much\s+of\s+your\s+conversation[\s\S]*?local\s+LLMs\s+can\s+remember\s+and\s+use\s+to\s+generate\s+responses\.\s*</g,
     ">上下文长度决定了本地大模型能记住并使用多少对话内容来生成回复。</",
   ],
   // Thinking.tsx -> interpolated "Thought for X seconds" template literal
   [/`Thought for \$\{thinkingTime\.toFixed\(1\)\} seconds`/g, "`思考了 ${thinkingTime.toFixed(1)} 秒`"],
   // Message.tsx -> "Search results for <InlineSearchTerm .../>" JSX fragment
   [/Search results for /g, "搜索结果: "],
+  // Message.tsx -> "Searching for <InlineSearchTerm .../>" JSX fragment
+  [/Searching for /g, "正在搜索: "],
+  // Message.tsx -> "Fetching for <InlineSearchTerm .../>" JSX fragment
+  [/Fetching for /g, "正在抓取: "],
+  // Message.tsx -> "Fetch results for {url}" JSX fragment
+  [/Fetch results for/g, "网页抓取结果: "],
+  // Message.tsx -> "Calling <span>{toolCall.function.name}</span>" JSX fragment
+  // 注意:必须带 <span 限定,否则会误伤其他文件里的英文注释(如 app.go 的 "Calling UpdateAvailable")
+  [/Calling <span/g, "正在调用 <span"],
+  // Message.tsx -> "Opening link #{id} from {page}" JSX fragment
+  [
+    /Opening link #\{id\} from \{cursorToPage\(cursor, browserToolResult\)\}/g,
+    "正在打开链接 #{id}:{cursorToPage(cursor, browserToolResult)}",
+  ],
+  // FileUpload.tsx -> 拖拽上传提示(JSX 文本跨两行)
+  [
+    /Drop\s+files\s+here\s+or\s+paste\s+from\s+clipboard\s+to\s+add\s+them\s+to\s+your\s+message/g,
+    "将文件拖到此处,或从剪贴板粘贴以添加到消息中",
+  ],
+  // Settings.tsx 标题 "Settings":前面有 {isWindows && ...} 代码块,词典的 >\s*Settings\s*< 规则匹配不到
+  [/\)\}\s*Settings\s*<\/h1>/, ")}\n          设置\n        </h1>"],
   // main.tsx -> 引入路由级错误兜底组件(中文版,替换 @tanstack/react-router 默认英文错误组件
   // "Something went wrong!" / "Show Error" / "Hide Error",该组件位于库内部,词典替换够不着)
   [

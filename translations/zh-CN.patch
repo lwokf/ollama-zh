@@ -172,6 +172,64 @@ index d73df2c..8b960ec 100644
  			}
  			return
  		}
+diff --git a/app/ui/app/src/api.ts b/app/ui/app/src/api.ts
+index c22fee0..08c28ec 100644
+--- a/app/ui/app/src/api.ts
++++ b/app/ui/app/src/api.ts
+@@ -85,7 +85,7 @@ export async function fetchConnectUrl(): Promise<string> {
+     }
+   }
+ 
+-  throw new Error("Failed to fetch connect URL");
++  throw new Error("获取连接地址失败");
+ }
+ 
+ export async function disconnectUser(): Promise<void> {
+@@ -97,7 +97,7 @@ export async function disconnectUser(): Promise<void> {
+   });
+ 
+   if (!response.ok) {
+-    throw new Error("Failed to disconnect user");
++    throw new Error("断开用户连接失败");
+   }
+ }
+ 
+@@ -262,7 +262,7 @@ export async function getSettings(): Promise<{
+ }> {
+   const response = await fetch(`${API_BASE}/api/v1/settings`);
+   if (!response.ok) {
+-    throw new Error("Failed to fetch settings");
++    throw new Error("获取设置失败");
+   }
+   const data = await response.json();
+   return {
+@@ -282,7 +282,7 @@ export async function updateSettings(settings: Settings): Promise<{
+   });
+   if (!response.ok) {
+     const error = await response.text();
+-    throw new Error(error || "Failed to update settings");
++    throw new Error(error || "更新设置失败");
+   }
+   const data = await response.json();
+   return {
+@@ -302,7 +302,7 @@ export async function updateCloudSetting(
+   });
+   if (!response.ok) {
+     const error = await response.text();
+-    throw new Error(error || "Failed to update cloud setting");
++    throw new Error(error || "更新云端设置失败");
+   }
+ 
+   const data = await response.json();
+@@ -322,7 +322,7 @@ export async function renameChat(chatId: string, title: string): Promise<void> {
+   });
+   if (!response.ok) {
+     const error = await response.text();
+-    throw new Error(error || "Failed to rename chat");
++    throw new Error(error || "重命名对话失败");
+   }
+ }
+ 
 diff --git a/app/ui/app/src/components/Chat.tsx b/app/ui/app/src/components/Chat.tsx
 index e0fcb4f..c957a83 100644
 --- a/app/ui/app/src/components/Chat.tsx
@@ -417,6 +475,59 @@ index 93975da..5352c61 100644
          </div>
          <div className="text-sm text-neutral-500 dark:text-neutral-500 ml-6">
            {`${formatBytes(completed, unit)} / ${formatBytes(total, unit)} (${Math.floor(percentage)}%)`}
+diff --git a/app/ui/app/src/components/ErrorFallback.tsx b/app/ui/app/src/components/ErrorFallback.tsx
+new file mode 100644
+index 0000000..35311d8
+--- /dev/null
++++ b/app/ui/app/src/components/ErrorFallback.tsx
+@@ -0,0 +1,47 @@
++import { useState } from "react";
++import type { ErrorComponentProps } from "@tanstack/react-router";
++
++/**
++ * 路由级错误兜底组件(中文版)。
++ * 替换 @tanstack/react-router 默认英文错误组件("Something went wrong!" / "Show Error" / "Hide Error"),
++ * 该组件位于 @tanstack/react-router 库内部,无法用词典替换,故在此提供中文实现,
++ * 并在 main.tsx 的 createRouter 中通过 defaultErrorComponent 注册为全局默认错误组件。
++ */
++export const ErrorFallback = ({ error }: ErrorComponentProps) => {
++  const [showDetails, setShowDetails] = useState(false);
++  return (
++    <div style={{ padding: ".5rem", maxWidth: "100%" }}>
++      <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
++        <strong style={{ fontSize: "1rem" }}>出错了!</strong>
++        <button
++          style={{
++            appearance: "none",
++            fontSize: ".6em",
++            border: "1px solid currentColor",
++            padding: ".1rem .2rem",
++            fontWeight: "bold",
++            borderRadius: ".25rem",
++          }}
++          onClick={() => setShowDetails((v) => !v)}
++        >
++          {showDetails ? "隐藏错误" : "显示错误"}
++        </button>
++      </div>
++      <div style={{ height: ".25rem" }} />
++      {showDetails && error.message && (
++        <pre
++          style={{
++            fontSize: ".7em",
++            border: "1px solid red",
++            borderRadius: ".25rem",
++            padding: ".3rem",
++            color: "red",
++            overflow: "auto",
++          }}
++        >
++          {error.message}
++        </pre>
++      )}
++    </div>
++  );
++};
 diff --git a/app/ui/app/src/components/ErrorMessage.tsx b/app/ui/app/src/components/ErrorMessage.tsx
 index 4ebbeec..e234621 100644
 --- a/app/ui/app/src/components/ErrorMessage.tsx
@@ -888,6 +999,26 @@ index bffb057..c2db3e4 100644
            className={`flex ml-1 items-center justify-center rounded-full transition-opacity duration-375 h-9 w-9 hover:bg-neutral-100 dark:hover:bg-neutral-700 ${
              settings.sidebarOpen
                ? "opacity-0 pointer-events-none"
+diff --git a/app/ui/app/src/main.tsx b/app/ui/app/src/main.tsx
+index 3e325a3..554fe0f 100644
+--- a/app/ui/app/src/main.tsx
++++ b/app/ui/app/src/main.tsx
+@@ -1,6 +1,7 @@
+ import { StrictMode } from "react";
+ import ReactDOM from "react-dom/client";
+ import { RouterProvider, createRouter } from "@tanstack/react-router";
++import { ErrorFallback } from "./components/ErrorFallback";
+ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+ import { routeTree } from "./routeTree.gen";
+ import { fetchUser } from "./api";
+@@ -26,6 +27,7 @@ fetchUser().then((userData) => {
+ const router = createRouter({
+   routeTree,
+   context: { queryClient },
++  defaultErrorComponent: ErrorFallback,
+ });
+ 
+ // Register the router instance for type safety
 diff --git a/app/ui/app/src/routes/c.$chatId.tsx b/app/ui/app/src/routes/c.$chatId.tsx
 index fa72ac4..4c293fe 100644
 --- a/app/ui/app/src/routes/c.$chatId.tsx

@@ -49,7 +49,72 @@ const specialRules = [
   [/`Thought for \$\{thinkingTime\.toFixed\(1\)\} seconds`/g, "`思考了 ${thinkingTime.toFixed(1)} 秒`"],
   // Message.tsx -> "Search results for <InlineSearchTerm .../>" JSX fragment
   [/Search results for /g, "搜索结果: "],
+  // main.tsx -> 引入路由级错误兜底组件(中文版,替换 @tanstack/react-router 默认英文错误组件
+  // "Something went wrong!" / "Show Error" / "Hide Error",该组件位于库内部,词典替换够不着)
+  [
+    /import \{ RouterProvider, createRouter \} from "@tanstack\/react-router";/,
+    'import { RouterProvider, createRouter } from "@tanstack/react-router";\nimport { ErrorFallback } from "./components/ErrorFallback";',
+  ],
+  // main.tsx -> 注册为全局默认错误组件(defaultErrorComponent)
+  [
+    /const router = createRouter\(\{\r?\n\s*routeTree,\r?\n\s*context: \{ queryClient \},\r?\n\}\);/,
+    "const router = createRouter({\n  routeTree,\n  context: { queryClient },\n  defaultErrorComponent: ErrorFallback,\n});",
+  ],
 ];
+
+// 新增文件:路由级错误兜底组件(中文版)
+// 替换 @tanstack/react-router 默认英文错误组件("Something went wrong!" / "Show Error" / "Hide Error"),
+// 通过 main.tsx 的 createRouter defaultErrorComponent 注册生效。
+const NEW_FILES = {
+  "app/ui/app/src/components/ErrorFallback.tsx": `import { useState } from "react";
+import type { ErrorComponentProps } from "@tanstack/react-router";
+
+/**
+ * 路由级错误兜底组件(中文版)。
+ * 替换 @tanstack/react-router 默认英文错误组件("Something went wrong!" / "Show Error" / "Hide Error"),
+ * 该组件位于 @tanstack/react-router 库内部,无法用词典替换,故在此提供中文实现,
+ * 并在 main.tsx 的 createRouter 中通过 defaultErrorComponent 注册为全局默认错误组件。
+ */
+export const ErrorFallback = ({ error }: ErrorComponentProps) => {
+  const [showDetails, setShowDetails] = useState(false);
+  return (
+    <div style={{ padding: ".5rem", maxWidth: "100%" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
+        <strong style={{ fontSize: "1rem" }}>出错了!</strong>
+        <button
+          style={{
+            appearance: "none",
+            fontSize: ".6em",
+            border: "1px solid currentColor",
+            padding: ".1rem .2rem",
+            fontWeight: "bold",
+            borderRadius: ".25rem",
+          }}
+          onClick={() => setShowDetails((v) => !v)}
+        >
+          {showDetails ? "隐藏错误" : "显示错误"}
+        </button>
+      </div>
+      <div style={{ height: ".25rem" }} />
+      {showDetails && error.message && (
+        <pre
+          style={{
+            fontSize: ".7em",
+            border: "1px solid red",
+            borderRadius: ".25rem",
+            padding: ".3rem",
+            color: "red",
+            overflow: "auto",
+          }}
+        >
+          {error.message}
+        </pre>
+      )}
+    </div>
+  );
+};
+`,
+};
 
 // Directories under upstream that hold user-facing UI strings.
 const SCOPE = ["app/ui/app/src", "app/wintray", "app/cmd", "app/ui/ui.go", "app/ui/app.go"];
@@ -104,4 +169,13 @@ if (srcResolved !== dstResolved) {
   fs.mkdirSync(dst, { recursive: true });
 }
 walk(src);
+
+// 写入新增文件(词典/替换规则无法表达的文件级新增)
+for (const [rel, content] of Object.entries(NEW_FILES)) {
+  const abs = path.join(dst, rel);
+  fs.mkdirSync(path.dirname(abs), { recursive: true });
+  fs.writeFileSync(abs, content);
+  replaced += countDiff("", content);
+}
+
 console.log(`translated tree written to ${dst}`);

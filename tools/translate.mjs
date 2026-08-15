@@ -43,8 +43,8 @@ const specialRules = [
   // Settings -> Context length description (JSX text spans multiple source lines)
   // 注意:> 与文本之间可能跨行,必须用 \s* 连接,否则 v0.32.13 起的多行写法匹配不到
   [
-    />\s*Context\s+length\s+determines\s+how\s+much\s+of\s+your\s+conversation[\s\S]*?local\s+LLMs\s+can\s+remember\s+and\s+use\s+to\s+generate\s+responses\.\s*</g,
-    ">上下文长度决定了本地大模型能记住并使用多少对话内容来生成回复。</",
+    />\s*Context\s+length\s+determines\s+how\s+much\s+of\s+your\s+conversation[\s\S]*?local\s+LLMs\s+can\s+remember\s+and\s+use\s+to\s+generate\s+responses\.\s*<\/Description>/g,
+    ">上下文长度决定了本地大模型能记住并使用多少对话内容来生成回复。</Description>",
   ],
   // Thinking.tsx -> interpolated "Thought for X seconds" template literal
   [/`Thought for \$\{thinkingTime\.toFixed\(1\)\} seconds`/g, "`思考了 ${thinkingTime.toFixed(1)} 秒`"],

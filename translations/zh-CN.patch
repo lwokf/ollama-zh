@@ -848,7 +848,7 @@ index 2dba77d..aba0d11 100644
          models.map((model, index) => {
            return (
 diff --git a/app/ui/app/src/components/Settings.tsx b/app/ui/app/src/components/Settings.tsx
-index 3f0f5c4..6eba774 100644
+index 3f0f5c4..003fabe 100644
 --- a/app/ui/app/src/components/Settings.tsx
 +++ b/app/ui/app/src/components/Settings.tsx
 @@ -246,15 +246,15 @@ export default function Settings() {
@@ -1020,7 +1020,7 @@ index 3f0f5c4..6eba774 100644
 -                      local LLMs can remember and use to generate responses.
 -                    </Description>
 +                    <Label>上下文长度</Label>
-+                    <Description>上下文长度决定了本地大模型能记住并使用多少对话内容来生成回复。<//Description>
++                    <Description>上下文长度决定了本地大模型能记住并使用多少对话内容来生成回复。</Description>
                      <div className="mt-3">
                        <Slider
                          value={settings.ContextLength || defaultContextLength || 0}

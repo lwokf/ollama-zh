@@ -17,7 +17,7 @@ import path from "node:path";
 const dictPath = path.join(import.meta.dirname, "..", "translations", "zh-CN.json");
 const dict = JSON.parse(fs.readFileSync(dictPath, "utf8"));
 
-const [src, dst] = process.argv.slice(2);
+let [src, dst] = process.argv.slice(2);
 if (!src || !dst) {
   console.error("usage: node tools/translate.mjs <source-dir> <output-dir>");
   process.exit(1);
@@ -184,9 +184,10 @@ if (!fs.existsSync(src)) {
   console.error(`source dir not found: ${src}`);
   process.exit(1);
 }
-const srcResolved = path.resolve(src);
-const dstResolved = path.resolve(dst);
-if (srcResolved !== dstResolved) {
+// Resolve to absolute paths so replace() works on Windows (backslash vs slash)
+src = path.resolve(src);
+dst = path.resolve(dst);
+if (src !== dst) {
   fs.rmSync(dst, { recursive: true, force: true });
   fs.mkdirSync(dst, { recursive: true });
 }
